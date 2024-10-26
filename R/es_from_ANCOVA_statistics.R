@@ -28,7 +28,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 18. Adjusted: ANCOVA statistics, eta-squared'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -45,6 +45,17 @@ es_from_ancova_t <- function(ancova_t, cov_outcome_r, n_cov_ancova, n_exp, n_nex
                              smd_to_cor = "viechtbauer", reverse_ancova_t) {
   if (missing(reverse_ancova_t)) reverse_ancova_t <- rep(FALSE, length(ancova_t))
   reverse_ancova_t[is.na(reverse_ancova_t)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_t")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   d <- ancova_t * sqrt(1/n_exp + 1/n_nexp) * sqrt(1 - cov_outcome_r^2)
 
@@ -89,7 +100,7 @@ es_from_ancova_t <- function(ancova_t, cov_outcome_r, n_cov_ancova, n_exp, n_nex
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 18. Adjusted: ANCOVA statistics, eta-squared'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -106,6 +117,17 @@ es_from_ancova_f <- function(ancova_f, cov_outcome_r, n_cov_ancova, n_exp, n_nex
                              smd_to_cor = "viechtbauer", reverse_ancova_f) {
   if (missing(reverse_ancova_f)) reverse_ancova_f <- rep(FALSE, length(ancova_f))
   reverse_ancova_f[is.na(reverse_ancova_f)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, ancova_f,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, ANCOVA F-test ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_f")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   t <- sqrt(ancova_f)
 
@@ -151,7 +173,7 @@ es_from_ancova_f <- function(ancova_f, cov_outcome_r, n_cov_ancova, n_exp, n_nex
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 18. Adjusted: ANCOVA statistics, eta-squared'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -168,6 +190,17 @@ es_from_ancova_t_pval <- function(ancova_t_pval, cov_outcome_r, n_cov_ancova, n_
                                   smd_to_cor = "viechtbauer", reverse_ancova_t_pval) {
   if (missing(reverse_ancova_t_pval)) reverse_ancova_t_pval <- rep(FALSE, length(ancova_t_pval))
   reverse_ancova_t_pval[is.na(reverse_ancova_t_pval)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, ancova_t_pval,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, ANCOVA p-value ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_t_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   t_inv <- abs(qt(
     p = ancova_t_pval / 2,
@@ -217,7 +250,7 @@ es_from_ancova_t_pval <- function(ancova_t_pval, cov_outcome_r, n_cov_ancova, n_
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 18. Adjusted: ANCOVA statistics, eta-squared'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -234,6 +267,17 @@ es_from_ancova_f_pval <- function(ancova_f_pval, cov_outcome_r, n_cov_ancova, n_
                                   smd_to_cor = "viechtbauer", reverse_ancova_f_pval) {
   if (missing(reverse_ancova_f_pval)) reverse_ancova_f_pval <- rep(FALSE, length(ancova_f_pval))
   reverse_ancova_f_pval[is.na(reverse_ancova_f_pval)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, ancova_f_pval,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, ANCOVA p-value ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_f_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   t_inv <- abs(qt(
     p = ancova_f_pval / 2,

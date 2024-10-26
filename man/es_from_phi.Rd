@@ -26,7 +26,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab D + G + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 8. Phi or chi-square'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }
@@ -44,7 +44,7 @@ is equal to a R, and the variances of R and Z are obtained using the approach pr
 by Lipsey et al. (2001) as well as by our own calculations.
 
 \strong{To estimate the OR, RR, NNT,},
-this function reconstructs a 2x2 table (using the approach proposed by Viecthbauer, 2023).
+this function reconstructs a 2x2 table (using the approach proposed by Viechtbauer, 2023).
 
 Then, the calculations of the \code{\link{es_from_2x2}()} function are applied.
 

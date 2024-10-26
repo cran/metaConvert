@@ -51,12 +51,11 @@ It is a wrapper of several functions from the 'compareDF' package.
 \examples{
 df.compare1 = df.compare1[order(df.compare1$author), ]
 df.compare2 = df.compare2[order(df.compare2$year), ]
-names(df.compare1)[2] <- "generate_warning"
 
 compare_df(
   df_extractor_1 = df.compare1,
   df_extractor_2 = df.compare2,
-  ordering_columns = c("study_id")
+  ordering_columns = c("author", "year")
 )
 }
 \references{

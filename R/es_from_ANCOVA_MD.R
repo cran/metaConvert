@@ -35,7 +35,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 20. Adjusted: Mean difference and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -58,6 +58,17 @@ es_from_ancova_md_sd <- function(ancova_md, ancova_md_sd,
   reverse_ancova_md[is.na(reverse_ancova_md)] <- FALSE
   if (length(reverse_ancova_md) == 1) reverse_ancova_md = c(rep(reverse_ancova_md, length(ancova_md)))
   if (length(reverse_ancova_md) != length(ancova_md)) stop("The length of the 'reverse_ancova_md' argument is incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       ancova_md_sd, cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed",
+                       "as well as the correlation and number of covariates in ANCOVA ",
+                       "should be >0."),
+                       func = "es_from_ancova_md_sd")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   md_sd <- ancova_md_sd / sqrt(1 - cov_outcome_r^2)
 
@@ -109,7 +120,7 @@ es_from_ancova_md_sd <- function(ancova_md, ancova_md_sd,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 20. Adjusted: Mean difference and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -132,6 +143,17 @@ es_from_ancova_md_se <- function(ancova_md, ancova_md_se,
   reverse_ancova_md[is.na(reverse_ancova_md)] <- FALSE
   if (length(reverse_ancova_md) == 1) reverse_ancova_md = c(rep(reverse_ancova_md, length(ancova_md)))
   if (length(reverse_ancova_md) != length(ancova_md)) stop("The length of the 'reverse_ancova_md' argument is incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       ancova_md_se, cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_md_se")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   ancova_md_sd <- ancova_md_se / sqrt(1/n_exp + 1/n_nexp)
 
@@ -159,6 +181,7 @@ es_from_ancova_md_se <- function(ancova_md, ancova_md_se,
 #' @param n_exp number of participants in the experimental/exposed group.
 #' @param n_nexp number of participants in the non-experimental/non-exposed group.
 #' @param smd_to_cor formula used to convert the \code{cohen_d} value into a coefficient correlation (see details).
+#' @param max_asymmetry A percentage indicating the tolerance before detecting asymmetry in the 95% CI bounds.
 #' @param reverse_ancova_md a logical value indicating whether the direction of generated effect sizes should be flipped.
 #'
 #' @details
@@ -180,7 +203,7 @@ es_from_ancova_md_se <- function(ancova_md, ancova_md_se,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 20. Adjusted: Mean difference and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -195,13 +218,30 @@ es_from_ancova_md_se <- function(ancova_md, ancova_md_se,
 #' )
 es_from_ancova_md_ci <- function(ancova_md, ancova_md_ci_lo, ancova_md_ci_up,
                                  cov_outcome_r, n_cov_ancova,
-                                 n_exp, n_nexp,
+                                 n_exp, n_nexp, max_asymmetry = 10,
                                  smd_to_cor = "viechtbauer",
                                  reverse_ancova_md) {
   if (missing(reverse_ancova_md)) reverse_ancova_md <- rep(FALSE, length(ancova_md))
   reverse_ancova_md[is.na(reverse_ancova_md)] <- FALSE
   if (length(reverse_ancova_md) == 1) reverse_ancova_md = c(rep(reverse_ancova_md, length(ancova_md)))
   if (length(reverse_ancova_md) != length(ancova_md)) stop("The length of the 'reverse_ancova_md' argument is incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_md_ci")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+  tryCatch({
+    .validate_ci_symmetry(ancova_md, ancova_md_ci_lo, ancova_md_ci_up,
+                         func = "es_from_ancova_md_ci",
+                         max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
 
   ancova_md_se <- (ancova_md_ci_up - ancova_md_ci_lo) / (2 * qt(0.975, n_exp + n_nexp - 2 - n_cov_ancova))
 
@@ -246,7 +286,7 @@ es_from_ancova_md_ci <- function(ancova_md, ancova_md_ci_lo, ancova_md_ci_up,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 20. Adjusted: Mean difference and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -269,6 +309,17 @@ es_from_ancova_md_pval <- function(ancova_md, ancova_md_pval,
   reverse_ancova_md[is.na(reverse_ancova_md)] <- FALSE
   if (length(reverse_ancova_md) == 1) reverse_ancova_md = c(rep(reverse_ancova_md, length(ancova_md)))
   if (length(reverse_ancova_md) != length(ancova_md)) stop("The length of the 'reverse_ancova_md' argument is incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       ancova_md_pval, cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, p-values ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_md_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   t <- qt(p = ancova_md_pval / 2,
           df = n_exp + n_nexp - 2 - n_cov_ancova,

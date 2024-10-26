@@ -5,7 +5,7 @@
 \alias{df.short}
 \title{Short version of the df.haza dataset}
 \format{
-An object of class \code{grouped_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 40 rows and 109 columns.
+An object of class \code{grouped_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 37 rows and 109 columns.
 }
 \source{
 Haza B, Gosling CJ, Conty L & Pinabiaux C (2024). Social Functioning in Children and Adolescents with ADHD: A Meta-analysis. Journal of Child Psychology and Psychiatry and Allied Disciplines.

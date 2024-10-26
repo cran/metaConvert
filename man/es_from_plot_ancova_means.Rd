@@ -77,7 +77,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 22. From plot: adjusted means and dispersion (adjusted)'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }
@@ -127,7 +127,7 @@ es_from_plot_ancova_means(
   n_exp = 35, n_nexp = 35,
   cov_outcome_r = 0.2, n_cov_ancova = 4,
   plot_ancova_mean_exp = 89, plot_ancova_mean_nexp = 104,
-  plot_ancova_mean_sd_lo_exp = 109, plot_ancova_mean_sd_lo_nexp = 83,
-  plot_ancova_mean_sd_up_exp = 69, plot_ancova_mean_sd_up_nexp = 125
+  plot_ancova_mean_sd_lo_exp = 69, plot_ancova_mean_sd_lo_nexp = 83,
+  plot_ancova_mean_sd_up_exp = 109, plot_ancova_mean_sd_up_nexp = 125
 )
 }

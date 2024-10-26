@@ -1,10 +1,10 @@
-citHeader("To cite metaumbrella in publications, please use:")
+citHeader("To cite metaConvert in publications, please use:")
 
 bibentry(
   bibtype  = "Manual",
   title    = "An Automatic Suite for Estimation of 11 Different Effect Size Measures and Flexible Conversion Across Them",
   author   = c(
-        person(given = "Corentin J.", family= "Gosling",  role = c("aut", "cre"),
+        person(given = c("Corentin", "J"), family= "Gosling",  role = c("aut", "cre"),
                 email = "corentin.gosling@parisnanterre.fr"),
         person(given = "Samuele",
                family= "Cortese", role = "aut",

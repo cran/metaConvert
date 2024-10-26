@@ -5,7 +5,7 @@
 \alias{df.compare2}
 \title{Fictitious dataset 2}
 \format{
-An object of class \code{data.frame} with 5 rows and 7 columns.
+An object of class \code{data.frame} with 6 rows and 7 columns.
 }
 \usage{
 df.compare2

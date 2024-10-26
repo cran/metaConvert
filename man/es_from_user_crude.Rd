@@ -10,7 +10,8 @@ es_from_user_crude(
   user_es_crude,
   user_se_crude,
   user_ci_lo_crude,
-  user_ci_up_crude
+  user_ci_up_crude,
+  max_asymmetry = 10
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ es_from_user_crude(
 \item{user_ci_lo_crude}{lower bound of the 95\% CI around the effect size value}
 
 \item{user_ci_up_crude}{upper bound of the 95\% CI around the effect size value}
+
+\item{max_asymmetry}{A percentage indicating the tolerance before detecting asymmetry in the 95\% CI bounds.}
 }
 \value{
 This function allows to directly input any of the 11 effect size measures
@@ -35,7 +38,7 @@ This function allows to directly input any of the 11 effect size measures
 \code{converted effect size measure} \tab No conversion performed\cr
 \tab \cr
 \code{required input data} \tab See 'Section 23. User's input (crude)'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

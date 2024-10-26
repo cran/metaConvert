@@ -12,6 +12,7 @@ es_from_ancova_md_ci(
   n_cov_ancova,
   n_exp,
   n_nexp,
+  max_asymmetry = 10,
   smd_to_cor = "viechtbauer",
   reverse_ancova_md
 )
@@ -31,6 +32,8 @@ es_from_ancova_md_ci(
 
 \item{n_nexp}{number of participants in the non-experimental/non-exposed group.}
 
+\item{max_asymmetry}{A percentage indicating the tolerance before detecting asymmetry in the 95\% CI bounds.}
+
 \item{smd_to_cor}{formula used to convert the \code{cohen_d} value into a coefficient correlation (see details).}
 
 \item{reverse_ancova_md}{a logical value indicating whether the direction of generated effect sizes should be flipped.}
@@ -44,7 +47,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 20. Adjusted: Mean difference and dispersion'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

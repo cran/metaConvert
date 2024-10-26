@@ -115,7 +115,7 @@ compare_df(
 ```
 
 Only rows with differences between the two datasets are identified, and you can easily retrieve the row number by looking at the ID in the rowname column. 
-In grey, values that are consistent between the two data extractors. In green/red, the values that differ. Here, the two data extractor did not agree on the 'n_exp' column for the row 3 (198 v 188), and on the 'prop_cases_nexp' for rows 4 (0.21 v 0.31) and 5 (0.45 v 0.4). 
+In grey, values that are consistent between the two data extractors. In green/red, the values that differ.  
 
 
 # Step 3. Effect size computation

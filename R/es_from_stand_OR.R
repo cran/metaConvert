@@ -141,7 +141,7 @@
 #'  \code{} \tab D + G + R + Z\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 2. Odds Ratio'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -228,9 +228,18 @@ es_from_or_se <- function(or, logor, logor_se, baseline_risk,
   if (length(reverse_or) == 1) reverse_or = c(rep(reverse_or, length(or)))
   if (length(reverse_or) != length(or)) stop("The length of the 'reverse_or' argument is incorrectly specified.")
 
-  or <- ifelse(is.na(or) & !is.na(logor), exp(logor), or)
+  tryCatch({
+    .validate_positive(logor_se, baseline_risk, small_margin_prop, n_exp, n_nexp,
+                       n_cases, n_controls, n_sample,
+                       error_message = paste0("The number of people exposed/non-exposed, cases/controls, total sample size, ",
+                                              "baseline risk, standard error of the logOR",
+                                              "should be >0."),
+                       func = "es_from_or_se")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
-  # or <- ifelse(reverse_or, 1 / or, or)
+  or <- ifelse(is.na(or) & !is.na(logor), exp(logor), or)
 
   logOR <- suppressWarnings(log(or))
 
@@ -249,6 +258,17 @@ es_from_or_se <- function(or, logor, logor_se, baseline_risk,
     n_sample = n_sample, reverse = reverse_or,
     smd_to_cor = rep("lipsey_cooper", length(d))
   )
+
+  row_miss = which(is.na(d_se))
+  es$d[row_miss] <- es$d_se[row_miss] <-
+    es$d_ci_lo[row_miss] <- es$d_ci_up[row_miss] <-
+    es$g[row_miss] <- es$g_se[row_miss] <-
+    es$g_ci_lo[row_miss] <- es$g_ci_up[row_miss] <- NA
+  es$r[row_miss] <- es$r_se[row_miss] <-
+    es$r_ci_lo[row_miss] <- es$r_ci_up[row_miss] <-
+    es$z[row_miss] <- es$z_se[row_miss] <-
+    es$z_ci_lo[row_miss] <- es$z_ci_up[row_miss] <- NA
+
 
   # OR -------
   es$logor <- ifelse(reverse_or, -logOR, logOR)
@@ -400,7 +420,7 @@ es_from_or_se <- function(or, logor, logor_se, baseline_risk,
 #'  \code{} \tab D + G + R + Z\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 2. Odds Ratio'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -442,7 +462,21 @@ es_from_or <- function(or, logor, n_cases, n_controls, n_sample,
   if (missing(reverse_or)) {
     reverse_or <- rep(FALSE, length(or))
   }
+  if (missing(n_sample)) {
+    n_sample <- rep(NA_real_, length(or))
+  }
   reverse_or[is.na(reverse_or)] <- FALSE
+
+  tryCatch({
+    .validate_positive(baseline_risk, small_margin_prop, n_exp, n_nexp,
+                       n_cases, n_controls, n_sample,
+                       error_message = paste0("The number of people exposed/non-exposed, cases/controls, total sample size, ",
+                                              "baseline risk,",
+                                              "should be >0."),
+                       func = "es_from_or")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   or <- ifelse(is.na(or) & !is.na(logor), exp(logor), or)
 
@@ -450,8 +484,9 @@ es_from_or <- function(or, logor, n_cases, n_controls, n_sample,
   log_or_se <- do.call(rbind, apply(dat_or_se, 1, .se_from_or))
 
   es <- es_from_or_se(
-    or = or, logor_se = log_or_se$se, n_cases = n_cases,
-    n_controls = n_controls, small_margin_prop = small_margin_prop,
+    or = or, logor_se = log_or_se$se,
+    n_cases = n_cases, n_controls = n_controls,
+    small_margin_prop = small_margin_prop,
     baseline_risk = baseline_risk, n_sample=n_sample,
     n_exp = n_exp, n_nexp = n_nexp,
     or_to_cor = or_to_cor, or_to_rr = or_to_rr,
@@ -480,6 +515,7 @@ es_from_or <- function(or, logor, n_cases, n_controls, n_sample,
 #' @param reverse_or a logical value indicating whether the direction of the generated effect sizes should be flipped.
 #' @param or_to_cor formula used to convert the \code{or} value into a correlation coefficient (see details).
 #' @param or_to_rr formula used to convert the \code{or} value into a risk ratio (see details).
+#' @param max_asymmetry A percentage indicating the tolerance before detecting asymmetry in the 95% CI bounds.
 #'
 #' @details
 #' This function computes the standard error of the (log) odds ratio
@@ -503,7 +539,7 @@ es_from_or <- function(or, logor, n_cases, n_controls, n_sample,
 #'  \code{} \tab D + G + R + Z\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 2. Odds Ratio'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -517,7 +553,7 @@ es_from_or <- function(or, logor, n_cases, n_controls, n_sample,
 #' )
 es_from_or_ci <- function(or, or_ci_lo, or_ci_up, logor, logor_ci_lo, logor_ci_up,
                           baseline_risk, small_margin_prop, n_exp, n_nexp,
-                          n_cases, n_controls, n_sample,
+                          n_cases, n_controls, n_sample, max_asymmetry = 10,
                           or_to_cor = "bonett", or_to_rr = "metaumbrella_cases",
                           reverse_or) {
   if (missing(or)) {
@@ -559,9 +595,39 @@ es_from_or_ci <- function(or, or_ci_lo, or_ci_up, logor, logor_ci_lo, logor_ci_u
   if (missing(reverse_or)) {
     reverse_or <- rep(FALSE, length(or))
   }
+  if (missing(n_sample)) {
+    n_sample <- rep(FALSE, length(or))
+  }
   reverse_or[is.na(reverse_or)] <- FALSE
 
   or <- ifelse(is.na(or) & !is.na(logor), exp(logor), or)
+
+  tryCatch({
+    .validate_positive(baseline_risk, small_margin_prop, n_exp, n_nexp,
+                       n_cases, n_controls, n_sample,
+                       error_message = paste0("The number of people exposed/non-exposed, cases/controls, total sample size, ",
+                                              "baseline risk, standard error of the logOR",
+                                              "should be >0."),
+                       func = "es_from_or_se")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
+  tryCatch({
+    .validate_ci_symmetry(logor, logor_ci_lo, logor_ci_up,
+                          func = "es_from_or_ci",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
+  tryCatch({
+    .validate_ci_symmetry(log(or), log(or_ci_lo), log(or_ci_up),
+                          func = "es_from_or_ci",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
+
 
   logor_ci_lo <- ifelse(is.na(logor_ci_lo) & !is.na(or_ci_lo), log(or_ci_lo), logor_ci_lo)
   logor_ci_up <- ifelse(is.na(logor_ci_up) & !is.na(or_ci_up), log(or_ci_up), logor_ci_up)
@@ -615,7 +681,7 @@ es_from_or_ci <- function(or, or_ci_lo, or_ci_up, logor, logor_ci_lo, logor_ci_u
 #'  \code{} \tab D + G + R + Z\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 2. Odds Ratio'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -662,7 +728,22 @@ es_from_or_pval <- function(or, logor, or_pval, baseline_risk, small_margin_prop
   if (missing(reverse_or_pval)) {
     reverse_or_pval <- rep(FALSE, length(or))
   }
+  if (missing(n_sample)) {
+    n_sample <- rep(FALSE, length(or))
+  }
   reverse_or_pval[is.na(reverse_or_pval)] <- FALSE
+
+  tryCatch({
+    .validate_positive(es_from_or_pval, baseline_risk,
+                       small_margin_prop, n_exp, n_nexp, n_cases,
+                       n_controls, n_sample,
+                       error_message = paste0("The number of people exposed/non-exposed, cases/controls, total sample size, ",
+                                              "baseline risk, p-value of the OR",
+                                              "should be >0."),
+                       func = "es_from_or_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   or <- ifelse(is.na(or) & !is.na(logor), exp(logor), or)
   logOR <- suppressWarnings(log(or))

@@ -1,14 +1,32 @@
+.quick_val_ci <- function(value, ci_lo, ci_up) {
+  # First check if any inputs are length 0
+  if (length(value) == 0 || length(ci_lo) == 0 || length(ci_up) == 0) {
+    return(FALSE)
+  }
+
+  lengths <- c(length(value), length(ci_lo), length(ci_up))
+  if (length(unique(lengths)) > 1) {
+    return(FALSE)
+  }
+
+  # Proceed with the original logic
+  mapply(function(v, l, u) {
+    if (is.na(v) || is.na(l) || is.na(u)) return(FALSE)
+    return((v - l) > 0 && (u - v) > 0)
+  }, value, ci_lo, ci_up)
+}
+
 .extract_info <- function(x) {
-  row <- which((!is.na(x$d) & !is.na(x$d_se)) |
-    (!is.na(x$g) & !is.na(x$g_se)) |
-    (!is.na(x$md) & !is.na(x$md_se)) |
-    (!is.na(x$r) & !is.na(x$r_se)) |
-    (!is.na(x$z) & !is.na(x$z_se)) |
-    (!is.na(x$logor) & !is.na(x$logor_se)) |
-    (!is.na(x$logrr) & !is.na(x$logrr_se)) |
-    (!is.na(x$logirr) & !is.na(x$logirr_se)) |
-    (!is.na(x$logcvr) & !is.na(x$logcvr_se)) |
-    (!is.na(x$logvr) & !is.na(x$logvr_se)))
+  row <- which((!is.na(x$d) & !is.na(x$d_se) & .quick_val_ci(x$d, x$d_ci_lo, x$d_ci_up)) |
+    (!is.na(x$g) & !is.na(x$g_se) & .quick_val_ci(x$g, x$g_ci_lo, x$g_ci_up)) |
+    (!is.na(x$md) & !is.na(x$md_se) & .quick_val_ci(x$md, x$md_ci_lo, x$md_ci_up)) |
+    (!is.na(x$r) & !is.na(x$r_se) & .quick_val_ci(x$r, x$r_ci_lo, x$r_ci_up)) |
+    (!is.na(x$z) & !is.na(x$z_se) & .quick_val_ci(x$z, x$z_ci_lo, x$z_ci_up)) |
+    (!is.na(x$logor) & !is.na(x$logor_se) & .quick_val_ci(x$logor, x$logor_ci_lo, x$logor_ci_up)) |
+    (!is.na(x$logrr) & !is.na(x$logrr_se) & .quick_val_ci(x$logrr, x$logrr_ci_lo, x$logrr_ci_up)) |
+    (!is.na(x$logirr) & !is.na(x$logirr_se) & .quick_val_ci(x$logirr, x$logirr_ci_lo, x$logirr_ci_up)) |
+    (!is.na(x$logcvr) & !is.na(x$logcvr_se) & .quick_val_ci(x$logcvr, x$logcvr_ci_lo, x$logcvr_ci_up)) |
+    (!is.na(x$logvr) & !is.na(x$logvr_se) & .quick_val_ci(x$logvr, x$logvr_ci_lo, x$logvr_ci_up)))
   info <- rep(NA, nrow(x))
   if (length(row) > 0) {
     info[row] <- x$info_used[row]

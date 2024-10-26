@@ -66,7 +66,7 @@
 #'  \code{converted effect size measure} \tab D + G + OR\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 4. Pearson's r or Fisher's z'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -105,6 +105,15 @@ es_from_pearson_r <- function(pearson_r, sd_iv, n_sample,
   if (missing(unit_type)) {
     unit_type <- rep(NA, length(pearson_r))
   }
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, sd_iv, n_sample,
+                       error_message = paste0("The number of people exposed/non-exposed, total sample size, and standard deviation  ",
+                                              "should be >0."),
+                       func = "es_from_pearson_r")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   if (!all(cor_to_smd %in% c("cooper", "mathur", "viechtbauer"))) {
     stop(paste0("'",
@@ -214,7 +223,7 @@ es_from_pearson_r <- function(pearson_r, sd_iv, n_sample,
 #'  \code{converted effect size measure} \tab D + G + OR\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 4. Pearson's r or Fisher's z'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -247,6 +256,14 @@ es_from_fisher_z <- function(fisher_z, n_sample, unit_type = "raw_scale",
   if (missing(unit_type)) {
     unit_type <- rep(NA, length(fisher_z))
   }
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, sd_iv, n_sample,
+                       error_message = paste0("The number of people exposed/non-exposed, total sample size, and standard deviation  ",
+                                              "should be >0."),
+                       func = "es_from_fisher_z")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   r <- tanh(fisher_z)
 

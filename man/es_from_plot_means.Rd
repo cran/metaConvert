@@ -71,7 +71,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 21. From plot: means and dispersion (crude)'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }
@@ -126,7 +126,7 @@ of the \code{\link{es_from_means_ci}} are used.
 es_from_plot_means(
   n_exp = 35, n_nexp = 35,
   plot_mean_exp = 89, plot_mean_nexp = 104,
-  plot_mean_sd_lo_exp = 109, plot_mean_sd_lo_nexp = 83,
-  plot_mean_sd_up_exp = 69, plot_mean_sd_up_nexp = 125
+  plot_mean_sd_lo_exp = 69, plot_mean_sd_lo_nexp = 83,
+  plot_mean_sd_up_exp = 109, plot_mean_sd_up_nexp = 125
 )
 }

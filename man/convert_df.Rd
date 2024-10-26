@@ -9,15 +9,17 @@ convert_df(
   measure = c("d", "g", "md", "logor", "logrr", "logirr", "nnt", "r", "z", "logvr",
     "logcvr"),
   main_es = TRUE,
-  es_selected = c("hierarchy", "minimum", "maximum"),
+  es_selected = c("auto", "hierarchy", "minimum", "maximum"),
+  selection_auto = c("crude", "paired", "adjusted"),
   split_adjusted = TRUE,
   format_adjusted = c("wide", "long"),
   verbose = TRUE,
+  max_asymmetry = 10,
   hierarchy = "means_sd > means_se > means_ci",
+  table_2x2_to_cor = "tetrachoric",
   rr_to_or = "metaumbrella",
   or_to_rr = "metaumbrella_cases",
   or_to_cor = "bonett",
-  table_2x2_to_cor = "lipsey",
   smd_to_cor = "viechtbauer",
   pre_post_to_smd = "bonett",
   r_pre_post = 0.5,
@@ -35,21 +37,25 @@ convert_df(
 
 \item{es_selected}{the method used to select the main effect size when several information allows to estimate an effect size for the same association/comparison. Must be either "minimum" (the smallest effect size will be selected), "maximum" (the largest effect size will be selected) or "hierarchy" (the effect size computed from the information specified highest in the hierarchy will be selected). See details.}
 
+\item{selection_auto}{a character string giving details on the best "auto" hierarchy to use (only useful when \code{hierarchy="auto"} and \code{measure= "d", "g" or "md"}). See details.}
+
 \item{split_adjusted}{a logical value indicating whether crude and adjusted effect sizes should be presented separately. See details.}
 
 \item{format_adjusted}{presentation format of the adjusted effect sizes. See details.}
 
 \item{verbose}{a logical variable indicating whether text outputs and messages should be generated. We recommend turning this option to FALSE only after having carefully read all the generated messages.}
 
-\item{hierarchy}{a character string indicating the hierarchy in the information to be prioritized for the effect size calculations (see details). See details.}
+\item{max_asymmetry}{A percentage indicating the tolerance before detecting asymmetry in the 95\% CI bounds.}
+
+\item{hierarchy}{a character string indicating the hierarchy in the information to be prioritized for the effect size calculations. See details.}
+
+\item{table_2x2_to_cor}{formula used to obtain a correlation coefficient from the contingency table. For now only 'tetrachoric' is available.}
 
 \item{rr_to_or}{formula used to convert the \code{rr} value into an odds ratio.}
 
 \item{or_to_rr}{formula used to convert the \code{or} value into a risk ratio.}
 
 \item{or_to_cor}{formula used to convert the \code{or} value into a correlation coefficient.}
-
-\item{table_2x2_to_cor}{formula used to obtain a correlation coefficient from the contingency table.}
 
 \item{smd_to_cor}{formula used to convert the \code{cohen_d} value into a coefficient correlation.}
 
@@ -121,11 +127,13 @@ If you choose to estimate one main effect size (i.e., by setting \code{main_es =
 you have several options to select this main effect size.
 If you set:
 \itemize{
-\item \code{es_selected = "hierarchy"}: the main effect size will be selected by prioritizing
+\item \code{es_selected = "auto"}: the main effect size will be \strong{automatically} selected, by prioritizing
 specific types of input data over other (see next section "Hierarchy").
-\item \code{es_selected = "minimum"}: the main effect size will be selected by selecting
+\item \code{es_selected = "hierarchy"}: the main effect size will be selected, by prioritizing
+specific types of input data over other (see next section "Hierarchy").
+\item \code{es_selected = "minimum"}: the main effect size will be selected, by selecting
 the lowest effect size available.
-\item \code{es_selected = "maximum"}: the main effect size will be selected by selecting
+\item \code{es_selected = "maximum"}: the main effect size will be selected, by selecting
 the highest effect size available.
 }
 }
@@ -134,11 +142,138 @@ the highest effect size available.
 
 More than 70 different combinations of input data can be used to estimate an effect size.
 You can retrieve the effect size measures estimated by each combination of input data
-in the \code{\link{see_input_data}()} function.
+in the \code{\link{see_input_data}()} function and online \code{https://metaconvert.org/input.html}.
 
-In the hierarchy argument, each type of input data should be separated by the symbol ">".
+You have two options to use a hierarchy in the types of input data.
+\itemize{
+\item an automatic way (\code{es_selected = "auto"})
+\item an manual way (\code{es_selected = "hierarchy"})
+}
+\subsection{Automatic}{
+
+If you select an automatic hierarchy, here are the types of input data that will be prioritized.
+\subsection{Crude SMD or MD (\code{measure=c("d", "g", "md")} and \code{selection_auto="crude"})}{
+\enumerate{
+\item User's input effect size value
+\item SMD value
+\item Means at post-test
+\item ANOVA/Student's t-test/point biserial correlation statistics
+\item Linear regression estimates
+\item Mean difference values
+\item Quartiles/median/maximum values
+\item Post-test means extracted from a plot
+\item Pre-test+post-test means or mean change
+\item Paired ANOVA/t-test statistics
+\item Odds ratio value
+\item Contingency table
+\item Correlation coefficients
+\item Phi/chi-square value
+}
+}
+
+\subsection{Paired SMD or MD (\code{measure=c("d", "g", "md")} and \code{selection_auto="paired"})}{
+\enumerate{
+\item User's input effect size value
+\item Paired SMD value
+\item Pre-test+post-test means or mean change
+\item Paired ANOVA/t-test statistics
+\item Means at post-test
+\item ANOVA/Student's t-test/point biserial correlation
+\item Linear regression estimates
+\item Mean difference values
+\item Quartiles/median/maximum values
+\item Odds ratio value
+\item Contingency table
+\item Correlation coefficients
+\item Phi/chi-square value
+}
+}
+
+\subsection{Adjusted SMD or MD (\code{measure=c("d", "g", "md")} and \code{selection_auto="adjusted"})}{
+\enumerate{
+\item User's input adjusted effect size value
+\item Adjusted SMD value
+\item Estimated marginal means from ANCOVA
+\item F- or t-test value from ANCOVA
+\item Adjusted mean difference from ANCOVA
+\item Estimated marginal means from ANCOVA extracted from a plot
+}
+}
+
+\subsection{Odds Ratio (\code{measure=c("or")})}{
+\enumerate{
+\item User's input effect size value
+\item Odds ratio value
+\item Contingency table
+\item Risk ratio values
+\item Phi/chi-square value
+\item Correlation coefficients
+\item (Then hierarchy as for "d" or "g" option crude)
+}
+}
+
+\subsection{Risk Ratio (\code{measure=c("rr")})}{
+\enumerate{
+\item User's input effect size value
+\item Risk ratio values
+\item Contingency table
+\item Odds ratio values
+\item Phi/chi-square value
+}
+}
+
+\subsection{Incidence rate ratio (\code{measure=c("irr")})}{
+\enumerate{
+\item User's input effect size value
+\item Number of cases and time of disease free observation time
+}
+}
+
+\subsection{Correlation (\code{measure=c("r", "z")})}{
+\enumerate{
+\item User's input effect size value
+\item Correlation coefficients
+\item Contingency table
+\item Odds ratio value
+\item Phi/chi-square value
+\item SMD value
+\item Means at post-test
+\item ANOVA/Student's t-test/point biserial correlation
+\item Linear regression estimates
+\item Mean difference values
+11 Quartiles/median/maximum values
+\item Post-test means extracted from a plot
+\item Pre-test+post-test means or mean change
+\item Paired ANOVA/t-test
+}
+}
+
+\subsection{Variability ratios (\code{measure=c("vr", "cvr")})}{
+\enumerate{
+\item User's input effect size value
+\item means/variability indices at post-test
+\item means/variability indices at post-test extracted from a plot
+}
+}
+
+\subsection{Number needed to treat (\code{measure=c("nnt")})}{
+\enumerate{
+\item User's input effect size value
+\item Contingency table
+\item Odds ratio values
+\item Risk ratio values
+\item Phi/chi-square value
+}
+}
+
+}
+
+\subsection{Manual}{
+
+If you select a manual hierarchy, you can specify the order in which you want to
+use each type of input data.
 You can prioritize some types of input data by placing them at the begining of the
-hierarchy argument.
+hierarchy argument, and you must separate all input data with a ">" separator.
 For example, if you set:
 \itemize{
 \item \code{hierarchy = "means_sd > means_se > student_t"}, the convert_df function will prioritize
@@ -153,6 +288,8 @@ Importantly, if none of the types of input data indicated in the \code{hierarchy
 can be used to estimate the target effect size measure,
 the \code{convert_df()} function will automatically try to use other types of input
 data to estimate an effect size.
+}
+
 }
 
 \subsection{Adjusted effect sizes}{

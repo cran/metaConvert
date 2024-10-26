@@ -10,7 +10,8 @@ es_from_user_adj(
   user_es_adj,
   user_se_adj,
   user_ci_lo_adj,
-  user_ci_up_adj
+  user_ci_up_adj,
+  max_asymmetry = 10
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ es_from_user_adj(
 \item{user_ci_lo_adj}{adjusted lower bound of the 95\% CI around the effect size value}
 
 \item{user_ci_up_adj}{adjusted upper bound of the 95\% CI around the effect size value}
+
+\item{max_asymmetry}{A percentage indicating the tolerance before detecting asymmetry in the 95\% CI bounds.}
 }
 \value{
 This function allows to directly input any of the 11 effect size measures
@@ -35,7 +38,7 @@ This function allows to directly input any of the 11 effect size measures
 \code{converted effect size measure} \tab No conversion performed\cr
 \tab \cr
 \code{required input data} \tab See 'Section 24. User's input (adjusted)'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

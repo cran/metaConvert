@@ -18,6 +18,7 @@ es_from_or_ci(
   n_cases,
   n_controls,
   n_sample,
+  max_asymmetry = 10,
   or_to_cor = "bonett",
   or_to_rr = "metaumbrella_cases",
   reverse_or
@@ -50,6 +51,8 @@ es_from_or_ci(
 
 \item{n_sample}{total number of participants in the sample}
 
+\item{max_asymmetry}{A percentage indicating the tolerance before detecting asymmetry in the 95\% CI bounds.}
+
 \item{or_to_cor}{formula used to convert the \code{or} value into a correlation coefficient (see details).}
 
 \item{or_to_rr}{formula used to convert the \code{or} value into a risk ratio (see details).}
@@ -66,7 +69,7 @@ This function estimates and converts between several effect size measures.
 \code{} \tab D + G + R + Z\cr
 \tab \cr
 \code{required input data} \tab See 'Section 2. Odds Ratio'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

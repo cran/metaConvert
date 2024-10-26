@@ -5,7 +5,7 @@
 \alias{df.haza}
 \title{Meta-analytic dataset inspired from Haza and colleagues (2024)}
 \format{
-An object of class \code{data.frame} with 177 rows and 106 columns.
+An object of class \code{data.frame} with 170 rows and 106 columns.
 }
 \source{
 Haza B, Gosling CJ, Conty L & Pinabiaux C (2024). Social Functioning in Children and Adolescents with ADHD: A Meta-analysis. Journal of Child Psychology and Psychiatry and Allied Disciplines.

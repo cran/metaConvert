@@ -23,7 +23,7 @@
 #'  \code{converted effect size measure} \tab N/A\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 5. Incidence Ratio Ratio'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -44,6 +44,15 @@ es_from_cases_time <- function(n_cases_exp, n_cases_nexp, time_exp, time_nexp, r
   reverse_irr[is.na(reverse_irr)] <- FALSE
   if (length(reverse_irr) == 1) reverse_irr = c(rep(reverse_irr, length(n_cases_exp)))
   if (length(reverse_irr) != length(n_cases_exp)) stop("The length of the 'reverse_irr' argument is incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_cases_exp, n_cases_nexp, time_exp, time_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed and time of disease-free observation time ",
+                                              "should be >0."),
+                       func = "es_from_cases_time")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   es <- data.frame(
     logirr = log((n_cases_exp / time_exp) / (n_cases_nexp / time_nexp)),

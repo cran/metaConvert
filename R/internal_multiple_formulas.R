@@ -450,29 +450,30 @@
                                table_2x2_to_cor, reverse_2x2) {
 
   if (table_2x2_to_cor == "lipsey") {
-    log_or <- log((n_cases_exp * n_controls_nexp) / (n_cases_nexp * n_controls_exp))
-    v.log_or <- 1 / n_cases_exp + 1 / n_cases_nexp + 1 / n_controls_exp + 1 / n_controls_nexp
-
-    r <- (n_cases_exp * n_controls_nexp - n_controls_exp * n_cases_nexp) /
-      sqrt((n_cases_exp + n_controls_exp) * (n_cases_nexp + n_controls_nexp) *
-        (n_cases_exp + n_cases_nexp) * (n_controls_exp + n_cases_nexp))
-    r_lipsey <- ifelse(reverse_2x2, -r, r)
-    z_lipsey <- atanh(r_lipsey)
-    vz_lipsey <- v.log_or * (z_lipsey^2) / (log_or^2)
-
-    z_lo_lipsey <- z_lipsey - qnorm(.975) * sqrt(vz_lipsey)
-    z_up_lipsey <- z_lipsey + qnorm(.975) * sqrt(vz_lipsey)
-    r_lo_lipsey <- tanh(z_lo_lipsey)
-    r_up_lipsey <- tanh(z_up_lipsey)
-
-    effective_n = 1/vz_lipsey + 3
-    vr_lipsey = (1 - r_lipsey^2)^2 / (effective_n - 1)
-
-    res <- cbind(
-      r_lipsey, vr_lipsey, r_lo_lipsey, r_up_lipsey,
-      z_lipsey, vz_lipsey, z_lo_lipsey, z_up_lipsey
-    )
-    return(res)
+    # TO DO
+    # log_or <- log((n_cases_exp * n_controls_nexp) / (n_cases_nexp * n_controls_exp))
+    # v.log_or <- 1 / n_cases_exp + 1 / n_cases_nexp + 1 / n_controls_exp + 1 / n_controls_nexp
+    #
+    # r <- (n_cases_exp * n_controls_nexp - n_controls_exp * n_cases_nexp) /
+    #   sqrt((n_cases_exp + n_controls_exp) * (n_cases_nexp + n_controls_nexp) *
+    #     (n_cases_exp + n_cases_nexp) * (n_controls_exp + n_cases_nexp))
+    # r_lipsey <- ifelse(reverse_2x2, -r, r)
+    # z_lipsey <- atanh(r_lipsey)
+    # vz_lipsey <- v.log_or * (z_lipsey^2) / (log_or^2)
+    #
+    # z_lo_lipsey <- z_lipsey - qnorm(.975) * sqrt(vz_lipsey)
+    # z_up_lipsey <- z_lipsey + qnorm(.975) * sqrt(vz_lipsey)
+    # r_lo_lipsey <- tanh(z_lo_lipsey)
+    # r_up_lipsey <- tanh(z_up_lipsey)
+    #
+    # effective_n = 1/vz_lipsey + 3
+    # vr_lipsey = (1 - r_lipsey^2)^2 / (effective_n - 1)
+    #
+    # res <- cbind(
+    #   r_lipsey, vr_lipsey, r_lo_lipsey, r_up_lipsey,
+    #   z_lipsey, vz_lipsey, z_lo_lipsey, z_up_lipsey
+    # )
+    # return(res)
   } else if (table_2x2_to_cor == "tetrachoric") {
     res <- .tet_r(as.numeric(n_cases_exp),
                   as.numeric(n_controls_exp),
@@ -750,16 +751,15 @@
       2 * r_pre_post_exp * mean_pre_sd_exp * mean_sd_exp
     d_exp <- (mean_pre_exp - mean_exp) / mean_pre_sd_exp
     g_exp <- d_exp * J_exp
-    var_d_exp <- var_exp / (mean_pre_sd_exp^2 * (n_exp - 1)) + g_exp^2 / (2 * (n_exp - 1))
-
-    var_g_exp <- J_exp^2 * var_d_exp
+    var_g_exp <- var_exp / (mean_pre_sd_exp^2 * (n_exp - 1)) + g_exp^2 / (2 * (n_exp - 1))
+    var_d_exp <-  var_g_exp / (J_exp^2)
 
     J_nexp <- .d_j(n_nexp - 1)
     var_nexp <- mean_pre_sd_nexp^2 + mean_sd_nexp^2 - 2 * r_pre_post_nexp * mean_pre_sd_nexp * mean_sd_nexp
     d_nexp <- (mean_pre_nexp - mean_nexp) / mean_pre_sd_nexp
     g_nexp <- d_nexp * J_nexp
-    var_d_nexp <- var_nexp / (mean_pre_sd_nexp^2 * (n_nexp - 1)) + g_nexp^2 / (2 * (n_nexp - 1))
-    var_g_nexp <- J_nexp^2 * var_d_nexp
+    var_g_nexp <- var_nexp / (mean_pre_sd_nexp^2 * (n_nexp - 1)) + g_nexp^2 / (2 * (n_nexp - 1))
+    var_d_nexp <-  var_g_nexp / (J_nexp^2)
 
     d_bonett <- d_exp - d_nexp
     g_bonett <- g_exp - g_nexp

@@ -2,7 +2,7 @@
 % Please edit documentation in R/es_from_stand_RR.R
 \name{es_from_rr_ci}
 \alias{es_from_rr_ci}
-\title{Convert a risk ratio value and 95\% confidence interval to three effect measures (SMD, OR, COR)}
+\title{Convert a risk ratio value and 95\% confidence interval to various effect size measures}
 \usage{
 es_from_rr_ci(
   rr,
@@ -18,6 +18,7 @@ es_from_rr_ci(
   n_controls,
   rr_to_or = "metaumbrella",
   smd_to_cor = "viechtbauer",
+  max_asymmetry = 10,
   reverse_rr
 )
 }
@@ -48,6 +49,8 @@ es_from_rr_ci(
 
 \item{smd_to_cor}{formula used to convert the SMD value (converted from RR) into a coefficient correlation (see \code{\link{es_from_cohen_d}}).}
 
+\item{max_asymmetry}{A percentage indicating the tolerance before detecting asymmetry in the 95\% CI bounds.}
+
 \item{reverse_rr}{a logical value indicating whether the direction of the generated effect sizes should be flipped.}
 }
 \value{
@@ -59,12 +62,12 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + NNT\cr
 \tab \cr
 \code{required input data} \tab See 'Section 3. Risk Ratio'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }
 \description{
-Convert a risk ratio value and 95\% confidence interval to three effect measures (SMD, OR, COR)
+Convert a risk ratio value and 95\% confidence interval to various effect size measures
 }
 \details{
 This function uses the 95\% CI of the (log) risk ratio to obtain the standard error (Section 6.5.2.2 in the Cochrane Handbook).

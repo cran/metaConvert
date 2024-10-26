@@ -35,7 +35,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab D + G + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 7. Contingency (2x2) table or proportions'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

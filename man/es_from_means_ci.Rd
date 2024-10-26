@@ -14,6 +14,7 @@ es_from_means_ci(
   n_exp,
   n_nexp,
   smd_to_cor = "viechtbauer",
+  max_asymmetry = 10,
   reverse_means
 )
 }
@@ -36,6 +37,8 @@ es_from_means_ci(
 
 \item{smd_to_cor}{formula used to convert the \code{cohen_d} value into a coefficient correlation (see details).}
 
+\item{max_asymmetry}{A percentage indicating the tolerance before detecting asymmetry in the 95\% CI bounds.}
+
 \item{reverse_means}{a logical value indicating whether the direction of the generated effect sizes should be flipped.}
 }
 \value{
@@ -47,7 +50,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 9. Means and dispersion (crude)'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

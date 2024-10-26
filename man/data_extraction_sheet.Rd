@@ -6,7 +6,7 @@
 \usage{
 data_extraction_sheet(
   measure = c("d", "g", "md", "or", "rr", "nnt", "r", "z", "logvr", "logcvr", "irr"),
-  type_of_measure = c("natural+converted", "natural"),
+  type_of_measure = c("natural", "natural+converted"),
   name = "mcv_data_extraction",
   extension = c("data.frame", ".txt", ".csv", ".xlsx"),
   verbose = TRUE

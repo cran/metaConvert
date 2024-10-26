@@ -13,7 +13,7 @@
 #'
 #' The formulas used to obtain the log VR are (formulas 5 and 15, Senior et al. 2020):
 #' \deqn{logvr = log(\frac{mean\_sd\_exp}{mean\_sd\_nexp}) + \frac{1}{2 * (n\_exp - 1)} - \frac{1}{2 * (n\_nexp - 1)}}
-#' \deqn{logvr\_se = \sqrt{\frac{1}{2 * (n\_exp - 1)} + \frac{1}{2 * (n\_nexp - 1)}}}
+#' \deqn{logvr\_se = \sqrt{\frac{1}{2} * (\frac{n\_nexp}{(n\_nexp - 1)^2} + \frac{n\_exp}{(n\_exp - 1)^2})}}
 #' \deqn{logvr\_ci\_lo = logvr - qnorm(.975) * logvr\_se}
 #' \deqn{logvr\_ci\_up = logvr + qnorm(.975) * logvr\_se}
 #'
@@ -91,7 +91,8 @@ es_variab_from_means_sd <- function(mean_exp, mean_nexp, mean_sd_exp, mean_sd_ne
     log(mean_sd_exp / mean_sd_nexp) + 1 / (2 * (n_exp - 1)) - 1 / (2 * (n_nexp - 1))
   )
   es$logvr <- ifelse(reverse_means_variability, -logvr, logvr)
-  es$logvr_se <- sqrt(1 / (2 * (n_exp - 1)) + 1 / (2 * (n_nexp - 1)))
+  es$logvr_se <- sqrt(1/2 * (n_nexp/((n_nexp - 1)^2) + n_exp/((n_exp - 1)^2)))
+  # es$logvr_se <- sqrt(1 / (2 * (n_exp - 1)) + 1 / (2 * (n_nexp - 1)))
   es$logvr_ci_lo <- es$logvr - qnorm(.975) * es$logvr_se
   es$logvr_ci_up <- es$logvr + qnorm(.975) * es$logvr_se
 

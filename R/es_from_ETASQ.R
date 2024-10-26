@@ -26,7 +26,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 11. ANOVA statistics, Student's t-test, or point-bis correlation'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -42,6 +42,16 @@
 es_from_etasq <- function(etasq, n_exp, n_nexp, smd_to_cor = "viechtbauer", reverse_etasq) {
   if (missing(reverse_etasq)) reverse_etasq <- rep(FALSE, length(etasq))
   reverse_etasq[is.na(reverse_etasq)] <- FALSE
+
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,etasq,
+                       error_message = paste0("The number of people exposed/non-exposed, and eta-squared ",
+                                              "should be >0."),
+                       func = "es_from_etasq")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   d <- 2 * (sqrt(etasq / (1 - etasq)))
 
@@ -85,7 +95,7 @@ es_from_etasq <- function(etasq, n_exp, n_nexp, smd_to_cor = "viechtbauer", reve
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 18. Adjusted: ANCOVA statistics, eta-squared'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -102,6 +112,17 @@ es_from_etasq_adj <- function(etasq_adj, n_exp, n_nexp, n_cov_ancova, cov_outcom
                               smd_to_cor = "viechtbauer", reverse_etasq) {
   if (missing(reverse_etasq)) reverse_etasq <- rep(FALSE, length(etasq_adj))
   reverse_etasq[is.na(reverse_etasq)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, etasq_adj,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, adjusted eta-squared, ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_etasq_adj")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   d <- 2 * (sqrt(etasq_adj / (1 - etasq_adj)))
 

@@ -54,7 +54,7 @@ This function estimates and converts between several effect size measures.
 \code{} \tab D + G + R + Z\cr
 \tab \cr
 \code{required input data} \tab See 'Section 2. Odds Ratio'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

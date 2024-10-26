@@ -35,7 +35,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab D + G + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 7. Contingency (2x2) table or proportions'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }
@@ -44,7 +44,7 @@ Convert a 2x2 table into several effect size measures
 }
 \details{
 This function first computes (log) odds ratio (OR), (log) risk ratio (RR) and number needed to treat (NNT)
-from the 2x2 table.
+from the 2x2 table. Note that if a cell is equal to 0, we applied the typical adjustment (add 0.5) to all cells.
 Cohen's d (D), Hedges' g (G) and correlation coefficients (R/Z) are then estimated from the OR.
 
 \strong{To estimate an OR}, the formulas used (Box 6.4.a in the Cochrane Handbook) are:
@@ -67,30 +67,7 @@ that is then converted to a SMD
 (see formula in \code{\link{es_from_or_se}()}).
 
 \strong{To convert the 2x2 table into a correlation coefficient},
-various formulas can be used.
-
-\strong{A.} First, Cooper et al. (2019) - \code{table_2x2_to_cor = "cooper"} -
-proposes to convert the
-2x2 table into a OR (formula above), to convert this OR into a SMD
-(see formula in \code{\link{es_from_or_se}()}), and to convert this
-SMD into a correlation coefficient (see formula in \code{\link{es_from_cohen_d}()},
-with the option \code{"smd_to_cor = 'lipsey_cooper'"}).
-
-\strong{B.} Second, a correlation coefficient (more precisely - a phi coefficient)
-can be obtained from the contingency table using the formula given in
-Lipsey and Wilson (2001) - \code{table_2x2_to_cor = "lipsey"}.
-The formulas used to estimate the r and z are:
-\deqn{r = \frac{(n\_cases\_exp*n\_controls\_nexp - n\_controls\_exp*n\_cases\_nexp)}{\sqrt{(n\_exp) * (n\_nexp) * (n\_cases) * (n\_controls\_exp+n\_cases\_nexp)}}}
-\deqn{z = atanh(r)}
-\deqn{z\_se = logor\_se^2 * \frac{z^2}{\log(or)^2}}
-\deqn{z\_ci\_lo = z - qnorm(.975)*z\_se}
-\deqn{z\_ci\_up = z + qnorm(.975)*z\_se}
-\deqn{r\_ci\_lo = tanh(z\_ci\_lo)}
-\deqn{r\_ci\_up = tanh(z\_ci\_up)}
-\deqn{effective\_n = \frac{1}{z\_se^2 + 3}}
-\deqn{r\_se = \frac{(1 - r^2)^2}{effective\_n - 1}}
-
-\strong{C.} Third, a tetrachoric correlation can be estimated from the 2x2 table
+For now, only the tetrachoric correlation is currently proposed
 \itemize{
 \item \code{table_2x2_to_cor = "tetrachoric"}.
 Given the heavy calculations required for this effect size measure,

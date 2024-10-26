@@ -71,7 +71,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 21. From plot: means and dispersion (crude)'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -81,8 +81,8 @@
 #' es_from_plot_means(
 #'   n_exp = 35, n_nexp = 35,
 #'   plot_mean_exp = 89, plot_mean_nexp = 104,
-#'   plot_mean_sd_lo_exp = 109, plot_mean_sd_lo_nexp = 83,
-#'   plot_mean_sd_up_exp = 69, plot_mean_sd_up_nexp = 125
+#'   plot_mean_sd_lo_exp = 69, plot_mean_sd_lo_nexp = 83,
+#'   plot_mean_sd_up_exp = 109, plot_mean_sd_up_nexp = 125
 #' )
 es_from_plot_means <- function(n_exp, n_nexp,
                                plot_mean_exp, plot_mean_nexp,
@@ -109,6 +109,15 @@ es_from_plot_means <- function(n_exp, n_nexp,
   if (missing(reverse_plot_means)) reverse_plot_means <- rep(FALSE, length(n_exp))
   reverse_plot_means[is.na(reverse_plot_means)] <- FALSE
 
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "should be >0."),
+                       func = "es_from_plot_means")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
   ## SD ------
   #### exp
   mean_sd_exp_lo <- plot_mean_exp - plot_mean_sd_lo_exp
@@ -127,15 +136,18 @@ es_from_plot_means <- function(n_exp, n_nexp,
 
   ## SE ------
   #### exp
+
   mean_se_exp_lo <- plot_mean_exp - plot_mean_se_lo_exp
   mean_se_exp_up <- plot_mean_se_up_exp - plot_mean_exp
   mean_se_exp_transit <- apply(cbind(mean_se_exp_lo, mean_se_exp_up), 1, mean, na.rm = TRUE)
-  mean_se_exp <- ifelse(is.na(mean_se_exp_lo) & is.na(mean_se_exp_up), NA_real_, mean_se_exp_transit)
+  mean_se_exp <- ifelse(is.na(mean_se_exp_lo) & is.na(mean_se_exp_up),
+                        NA_real_, mean_se_exp_transit)
   #### nexp
   mean_se_nexp_lo <- plot_mean_nexp - plot_mean_se_lo_nexp
   mean_se_nexp_up <- plot_mean_se_up_nexp - plot_mean_nexp
   mean_se_nexp_transit <- apply(cbind(mean_se_nexp_lo, mean_se_nexp_up), 1, mean, na.rm = TRUE)
-  mean_se_nexp <- ifelse(is.na(mean_se_nexp_lo) & is.na(mean_se_nexp_up), NA_real_, mean_se_nexp_transit)
+  mean_se_nexp <- ifelse(is.na(mean_se_nexp_lo) & is.na(mean_se_nexp_up), NA_real_,
+                         mean_se_nexp_transit)
 
   es <- es_from_means_sd(
     n_exp = n_exp, n_nexp = n_nexp,
@@ -240,7 +252,7 @@ es_from_plot_means <- function(n_exp, n_nexp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 22. From plot: adjusted means and dispersion (adjusted)'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -253,8 +265,8 @@ es_from_plot_means <- function(n_exp, n_nexp,
 #'   n_exp = 35, n_nexp = 35,
 #'   cov_outcome_r = 0.2, n_cov_ancova = 4,
 #'   plot_ancova_mean_exp = 89, plot_ancova_mean_nexp = 104,
-#'   plot_ancova_mean_sd_lo_exp = 109, plot_ancova_mean_sd_lo_nexp = 83,
-#'   plot_ancova_mean_sd_up_exp = 69, plot_ancova_mean_sd_up_nexp = 125
+#'   plot_ancova_mean_sd_lo_exp = 69, plot_ancova_mean_sd_lo_nexp = 83,
+#'   plot_ancova_mean_sd_up_exp = 109, plot_ancova_mean_sd_up_nexp = 125
 #' )
 es_from_plot_ancova_means <- function(n_exp, n_nexp,
                                       plot_ancova_mean_exp, plot_ancova_mean_nexp,
@@ -281,6 +293,17 @@ es_from_plot_ancova_means <- function(n_exp, n_nexp,
 
   if (missing(reverse_plot_ancova_means)) reverse_plot_ancova_means <- rep(FALSE, length(n_exp))
   reverse_plot_ancova_means[is.na(reverse_plot_ancova_means)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_plot_ancova_means")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   ## SD ------
   #### exp

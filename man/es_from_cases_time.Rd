@@ -26,7 +26,7 @@ This function estimates IRR.
 \code{converted effect size measure} \tab N/A\cr
 \tab \cr
 \code{required input data} \tab See 'Section 5. Incidence Ratio Ratio'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

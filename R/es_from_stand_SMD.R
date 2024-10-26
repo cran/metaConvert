@@ -83,7 +83,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 1. Cohen's d or Hedges' g'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -96,6 +96,16 @@
 es_from_cohen_d <- function(cohen_d, n_exp, n_nexp, smd_to_cor = "viechtbauer", reverse_d) {
   if (missing(reverse_d)) reverse_d <- rep(FALSE, length(n_exp))
   reverse_d[is.na(reverse_d)] <- FALSE
+
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "should be >0."),
+                       func = "es_from_cohen_d")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   es <- .es_from_d(
     d = cohen_d, n_exp = n_exp, n_nexp = n_nexp,
@@ -139,7 +149,7 @@ es_from_cohen_d <- function(cohen_d, n_exp, n_nexp, smd_to_cor = "viechtbauer", 
 #'  \code{converted effect size measure} \tab OR + R + Z\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 1. Cohen's d or Hedges' g'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -153,6 +163,15 @@ es_from_cohen_d_adj <- function(cohen_d_adj, n_cov_ancova, cov_outcome_r, n_exp,
                                 smd_to_cor = "viechtbauer", reverse_d) {
   if (missing(reverse_d)) reverse_d <- rep(FALSE, length(n_exp))
   reverse_d[is.na(reverse_d)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "should be >0."),
+                       func = "es_from_cohen_d_adj")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   es <- .es_from_d_ancova(
     d = cohen_d_adj, n_cov_ancova = n_cov_ancova,
@@ -203,7 +222,7 @@ es_from_cohen_d_adj <- function(cohen_d_adj, n_cov_ancova, cov_outcome_r, n_exp,
 #'  \code{converted effect size measure} \tab OR + R + Z\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 1. Cohen's d or Hedges' g'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -218,6 +237,15 @@ es_from_hedges_g <- function(hedges_g, n_exp, n_nexp, smd_to_cor = "viechtbauer"
   reverse_g[is.na(reverse_g)] <- FALSE
   if (length(reverse_g) == 1) reverse_g = c(rep(reverse_g, length(hedges_g)))
   if (length(reverse_g) != length(hedges_g)) stop("The length of the 'reverse_g' argument is incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "should be >0."),
+                       func = "es_from_cohen_d_adj")
+  }, error = function(e) {
+    stop("Data es_from_hedges_g error: ", conditionMessage(e), "\n")
+  })
 
   df <- n_exp + n_nexp - 2
 

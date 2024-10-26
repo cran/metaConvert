@@ -50,7 +50,7 @@ This function converts the means and standard deviations of two independent grou
 
 The formulas used to obtain the log VR are (formulas 5 and 15, Senior et al. 2020):
 \deqn{logvr = log(\frac{mean\_sd\_exp}{mean\_sd\_nexp}) + \frac{1}{2 * (n\_exp - 1)} - \frac{1}{2 * (n\_nexp - 1)}}
-\deqn{logvr\_se = \sqrt{\frac{1}{2 * (n\_exp - 1)} + \frac{1}{2 * (n\_nexp - 1)}}}
+\deqn{logvr\_se = \sqrt{\frac{1}{2} * (\frac{n\_nexp}{(n\_nexp - 1)^2} + \frac{n\_exp}{(n\_exp - 1)^2})}}
 \deqn{logvr\_ci\_lo = logvr - qnorm(.975) * logvr\_se}
 \deqn{logvr\_ci\_up = logvr + qnorm(.975) * logvr\_se}
 

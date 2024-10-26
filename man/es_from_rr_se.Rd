@@ -2,7 +2,7 @@
 % Please edit documentation in R/es_from_stand_RR.R
 \name{es_from_rr_se}
 \alias{es_from_rr_se}
-\title{Convert a risk ratio value and standard error to three effect measures (SMD, OR, COR)}
+\title{Convert a risk ratio value and standard error to various effect size measures}
 \usage{
 es_from_rr_se(
   rr,
@@ -50,12 +50,12 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + NNT\cr
 \tab \cr
 \code{required input data} \tab See 'Section 3. Risk Ratio'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }
 \description{
-Convert a risk ratio value and standard error to three effect measures (SMD, OR, COR)
+Convert a risk ratio value and standard error to various effect size measures
 }
 \details{
 This function converts the (log) risk ratio (RR) value and its standard error
@@ -95,11 +95,6 @@ Di Pietrantonj (2006).
 
 \strong{To estimate the NNT}, the formulas used are :
 \deqn{nnt = \frac{1}{br * (1 - rr)}}
-
-\strong{To estimate the Cohen's d value and its standard error}, the function first converts the RR value and standard error into OR and standard error,
-and then converts these values into Cohen's d using the following formulas:
-\deqn{cohen\_d = \log(or) * \frac{\sqrt{3}}{\pi}}
-\deqn{cohen\_d\_se = \sqrt{\frac{logor\_se^2 * 3}{\pi^2}}}
 }
 \examples{
 es_from_rr_se(rr = 2.12, logrr_se = 0.242, n_exp = 120, n_nexp = 44)

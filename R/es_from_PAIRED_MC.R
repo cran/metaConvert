@@ -42,7 +42,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 14. Paired: mean change, and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -69,6 +69,16 @@ es_from_mean_change_sd <- function(mean_change_exp, mean_change_sd_exp,
   r_pre_post_nexp[is.na(r_pre_post_nexp)] <- 0.5
   if (missing(r_pre_post_exp)) r_pre_post_exp <- rep(0.5, length(mean_change_exp))
   r_pre_post_exp[is.na(r_pre_post_exp)] <- 0.5
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       mean_change_sd_exp, mean_change_sd_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed and standard deviations ",
+                                              "should be >0."),
+                       func = "es_from_mean_change_sd")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   es <- es_from_means_sd_pre_post(
     mean_pre_exp = mean_change_exp,
@@ -135,7 +145,7 @@ es_from_mean_change_sd <- function(mean_change_exp, mean_change_sd_exp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 14. Paired: mean change, and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -162,6 +172,16 @@ es_from_mean_change_se <- function(mean_change_exp, mean_change_se_exp,
   r_pre_post_nexp[is.na(r_pre_post_nexp)] <- 0.5
   if (missing(r_pre_post_exp)) r_pre_post_exp <- rep(0.5, length(mean_change_exp))
   r_pre_post_exp[is.na(r_pre_post_exp)] <- 0.5
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       mean_change_se_exp, mean_change_se_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed and standard errors ",
+                                              "should be >0."),
+                       func = "es_from_mean_change_se")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   es <- es_from_means_se_pre_post(
     mean_pre_exp = mean_change_exp,
@@ -198,6 +218,7 @@ es_from_mean_change_se <- function(mean_change_exp, mean_change_se_exp,
 #' @param r_pre_post_exp pre-post correlation in the experimental/exposed group
 #' @param r_pre_post_nexp pre-post correlation in the non-experimental/non-exposed group
 #' @param smd_to_cor formula used to convert the \code{cohen_d} value into a coefficient correlation (see details).
+#' @param max_asymmetry A percentage indicating the tolerance before detecting asymmetry in the 95% CI bounds.
 #' @param reverse_mean_change a logical value indicating whether the direction of generated effect sizes should be flipped.
 #'
 #' @details
@@ -239,7 +260,7 @@ es_from_mean_change_se <- function(mean_change_exp, mean_change_se_exp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 14. Paired: mean change, and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -259,7 +280,7 @@ es_from_mean_change_ci <- function(mean_change_exp,
                                    mean_change_nexp,
                                    mean_change_ci_lo_nexp, mean_change_ci_up_nexp,
                                    r_pre_post_exp, r_pre_post_nexp,
-                                   n_exp, n_nexp,
+                                   n_exp, n_nexp, max_asymmetry = 10,
                                    smd_to_cor = "viechtbauer", reverse_mean_change) {
   if (missing(reverse_mean_change)) reverse_mean_change <- rep(FALSE, length(mean_change_exp))
   if (missing(reverse_mean_change)) reverse_mean_change <- rep(FALSE, length(mean_change_exp))
@@ -268,6 +289,29 @@ es_from_mean_change_ci <- function(mean_change_exp,
   r_pre_post_nexp[is.na(r_pre_post_nexp)] <- 0.5
   if (missing(r_pre_post_exp)) r_pre_post_exp <- rep(0.5, length(mean_change_exp))
   r_pre_post_exp[is.na(r_pre_post_exp)] <- 0.5
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "should be >0."),
+                       func = "es_from_mean_change_ci")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+  tryCatch({
+    .validate_ci_symmetry(mean_change_exp, mean_change_ci_lo_exp, mean_change_ci_up_exp,
+                          func = "es_from_mean_change_ci",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
+  tryCatch({
+    .validate_ci_symmetry(mean_change_nexp, mean_change_ci_lo_nexp, mean_change_ci_up_nexp,
+                          func = "es_from_mean_change_ci",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
 
   es <- es_from_means_ci_pre_post(
     mean_pre_exp = mean_change_exp,
@@ -346,7 +390,7 @@ es_from_mean_change_ci <- function(mean_change_exp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 14. Paired: mean change, and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -371,6 +415,15 @@ es_from_mean_change_pval <- function(mean_change_exp, mean_change_pval_exp,
   r_pre_post_nexp[is.na(r_pre_post_nexp)] <- 0.5
   if (missing(r_pre_post_exp)) r_pre_post_exp <- rep(0.5, length(mean_change_exp))
   r_pre_post_exp[is.na(r_pre_post_exp)] <- 0.5
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, mean_change_pval_exp, mean_change_pval_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed and p-values ",
+                                              "should be >0."),
+                       func = "es_from_mean_change_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   t_exp <- qt(p = mean_change_pval_exp / 2, df = n_exp - 1, lower.tail = FALSE)
   t_nexp <- qt(p = mean_change_pval_nexp / 2, df = n_nexp - 1, lower.tail = FALSE)

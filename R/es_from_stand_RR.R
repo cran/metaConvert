@@ -1,4 +1,4 @@
-#' Convert a risk ratio value and standard error to three effect measures (SMD, OR, COR)
+#' Convert a risk ratio value and standard error to various effect size measures
 #'
 #' @param rr risk ratio value
 #' @param logrr log risk ratio value
@@ -51,11 +51,6 @@
 #' **To estimate the NNT**, the formulas used are :
 #' \deqn{nnt = \frac{1}{br * (1 - rr)}}
 #'
-#' **To estimate the Cohen's d value and its standard error**, the function first converts the RR value and standard error into OR and standard error,
-#' and then converts these values into Cohen's d using the following formulas:
-#' \deqn{cohen\_d = \log(or) * \frac{\sqrt{3}}{\pi}}
-#' \deqn{cohen\_d\_se = \sqrt{\frac{logor\_se^2 * 3}{\pi^2}}}
-#'
 #' @references
 #' Di Pietrantonj C. (2006). Four-fold table cell frequencies imputation in meta analysis. Statistics in medicine, 25(13), 2299–2322. https://doi.org/10.1002/sim.2287
 #'
@@ -74,7 +69,7 @@
 #'  \code{converted effect size measure} \tab OR + NNT\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 3. Risk Ratio'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -119,6 +114,17 @@ es_from_rr_se <- function(rr, logrr, logrr_se, baseline_risk,
                 "' not in tolerated values for the 'rr_to_or' argument.
                 Possible inputs are: 'metaumbrella', 'transpose', 'grant', 'dipietrantonj'"))
   }
+
+
+  tryCatch({
+    .validate_positive(logrr_se, baseline_risk, n_exp, n_nexp, n_cases, n_controls,
+                       error_message = paste0("The number of people exposed/non-exposed, cases/controls, total sample size, ",
+                                              "baseline risk, standard error of the logRR",
+                                              "should be >0."),
+                       func = "es_from_rr_se")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   rr <- ifelse(is.na(rr) & !is.na(logrr), exp(logrr), rr)
   # rr <- ifelse(reverse_rr, 1 / rr, rr)
@@ -180,7 +186,7 @@ es_from_rr_se <- function(rr, logrr, logrr_se, baseline_risk,
 }
 
 
-#' Convert a risk ratio value and 95% confidence interval to three effect measures (SMD, OR, COR)
+#' Convert a risk ratio value and 95% confidence interval to various effect size measures
 #'
 #' @param rr risk ratio value
 #' @param logrr log risk ratio value
@@ -194,6 +200,7 @@ es_from_rr_se <- function(rr, logrr, logrr_se, baseline_risk,
 #' @param n_nexp number of participants in the non-exposed group (only required for the \code{rr_to_or = "grant_CI"}, \code{rr_to_or = "grant_2x2"} arguments).
 #' @param baseline_risk proportion of cases in the non-exposed group (only required for the \code{rr_to_or = "grant_CI"} and \code{rr_to_or = "grant_2x2"} arguments).
 #' @param reverse_rr a logical value indicating whether the direction of the generated effect sizes should be flipped.
+#' @param max_asymmetry A percentage indicating the tolerance before detecting asymmetry in the 95% CI bounds.
 #' @param smd_to_cor formula used to convert the SMD value (converted from RR) into a coefficient correlation (see \code{\link{es_from_cohen_d}}).
 #' @param rr_to_or formula used to convert the \code{rr} value into an odds ratio (see details).
 #'
@@ -215,7 +222,7 @@ es_from_rr_se <- function(rr, logrr, logrr_se, baseline_risk,
 #'  \code{converted effect size measure} \tab OR + NNT\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 3. Risk Ratio'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -230,7 +237,7 @@ es_from_rr_se <- function(rr, logrr, logrr_se, baseline_risk,
 #' )
 es_from_rr_ci <- function(rr, rr_ci_lo, rr_ci_up, logrr, logrr_ci_lo, logrr_ci_up, baseline_risk,
                           n_exp, n_nexp, n_cases, n_controls, rr_to_or = "metaumbrella",
-                          smd_to_cor = "viechtbauer", reverse_rr) {
+                          smd_to_cor = "viechtbauer", max_asymmetry = 10, reverse_rr) {
   if (missing(rr)) {
     rr <- rep(NA_real_, length(logrr))
   }
@@ -269,6 +276,31 @@ es_from_rr_ci <- function(rr, rr_ci_lo, rr_ci_up, logrr, logrr_ci_lo, logrr_ci_u
   }
   reverse_rr[is.na(reverse_rr)] <- FALSE
 
+  tryCatch({
+    .validate_positive(baseline_risk, n_exp, n_nexp, n_cases, n_controls,
+                       error_message = paste0("The number of people exposed/non-exposed, cases/controls, total sample size, ",
+                                              "baseline risk, standard error of the logRR",
+                                              "should be >0."),
+                       func = "es_from_rr_ci")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
+  tryCatch({
+    .validate_ci_symmetry(logrr, logrr_ci_lo, logrr_ci_up,
+                          func = "es_from_rr_ci",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
+  tryCatch({
+    .validate_ci_symmetry(log(rr), log(rr_ci_lo), log(rr_ci_up),
+                          func = "es_from_rr_ci",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
+
   rr <- ifelse(is.na(rr) & !is.na(logrr), exp(logrr), rr)
   logrr_ci_lo <- ifelse(is.na(logrr_ci_lo) & !is.na(rr_ci_lo), log(rr_ci_lo), logrr_ci_lo)
   logrr_ci_up <- ifelse(is.na(logrr_ci_up) & !is.na(rr_ci_up), log(rr_ci_up), logrr_ci_up)
@@ -286,7 +318,7 @@ es_from_rr_ci <- function(rr, rr_ci_lo, rr_ci_up, logrr, logrr_ci_lo, logrr_ci_u
   return(es)
 }
 
-#' Convert a risk ratio value and its p-value to three effect measures (SMD, OR, COR)
+#' Convert a risk ratio value and its p-value to various effect size measures
 #'
 #' @param rr risk ratio value
 #' @param logrr log risk ratio value
@@ -321,7 +353,7 @@ es_from_rr_ci <- function(rr, rr_ci_lo, rr_ci_up, logrr, logrr_ci_lo, logrr_ci_u
 #'  \code{converted effect size measure} \tab OR + NNT\cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 3. Risk Ratio'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -355,6 +387,17 @@ es_from_rr_pval <- function(rr, logrr, rr_pval, baseline_risk,
   }
   if (missing(reverse_rr_pval)) reverse_rr_pval <- rep(FALSE, length(rr))
   reverse_rr_pval[is.na(reverse_rr_pval)] <- FALSE
+
+  tryCatch({
+    .validate_positive(rr_pval, baseline_risk, n_exp, n_nexp, n_cases, n_controls,
+                       error_message = paste0("The number of people exposed/non-exposed, cases/controls, total sample size, ",
+                                              "baseline risk, p-value of the OR",
+                                              "should be >0."),
+                       func = "es_from_rr_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
 
   rr <- ifelse(is.na(rr) & !is.na(logrr), exp(logrr), rr)
   z_rr <- sign(log(rr)) * qnorm(rr_pval / 2, lower.tail = FALSE)

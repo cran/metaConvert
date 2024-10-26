@@ -33,7 +33,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 16. Paired: Paired F- or t-test'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -53,6 +53,15 @@ es_from_paired_t <- function(paired_t_exp, paired_t_nexp, n_exp, n_nexp,
   reverse_paired_t[is.na(reverse_paired_t)] <- FALSE
   if (length(reverse_paired_t) == 1) reverse_paired_t = c(rep(reverse_paired_t, length(paired_t_exp)))
   if (length(reverse_paired_t) != length(paired_t_exp)) stop("The length of the 'reverse_paired_t' argument of incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "should be >0."),
+                       func = "es_from_paired_t")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   if (missing(r_pre_post_nexp)) r_pre_post_nexp <- rep(0.5, length(paired_t_exp))
   r_pre_post_nexp[is.na(r_pre_post_nexp)] <- 0.5
@@ -128,7 +137,7 @@ es_from_paired_t <- function(paired_t_exp, paired_t_nexp, n_exp, n_nexp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 16. Paired: Paired F- or t-test'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -147,6 +156,16 @@ es_from_paired_t_pval <- function(paired_t_pval_exp, paired_t_pval_nexp, n_exp, 
   r_pre_post_nexp[is.na(r_pre_post_nexp)] <- 0.5
   if (missing(r_pre_post_exp)) r_pre_post_exp <- rep(0.5, length(paired_t_pval_exp))
   r_pre_post_exp[is.na(r_pre_post_exp)] <- 0.5
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, paired_t_pval_exp, paired_t_pval_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "and p-values ",
+                                              "should be >0."),
+                       func = "es_from_paired_t_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   paired_t_exp <- qt(p = paired_t_pval_exp / 2, df = n_exp - 1, lower.tail = FALSE)
 
@@ -198,7 +217,7 @@ es_from_paired_t_pval <- function(paired_t_pval_exp, paired_t_pval_nexp, n_exp, 
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 16. Paired: Paired F- or t-test'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -217,6 +236,16 @@ es_from_paired_f <- function(paired_f_exp, paired_f_nexp, n_exp, n_nexp,
   r_pre_post_nexp[is.na(r_pre_post_nexp)] <- 0.5
   if (missing(r_pre_post_exp)) r_pre_post_exp <- rep(0.5, length(paired_f_exp))
   r_pre_post_exp[is.na(r_pre_post_exp)] <- 0.5
+
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, paired_f_exp, paired_f_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "should be >0."),
+                       func = "es_from_paired_f")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   paired_t_exp <- sqrt(paired_f_exp)
 
@@ -269,7 +298,7 @@ es_from_paired_f <- function(paired_f_exp, paired_f_nexp, n_exp, n_nexp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 16. Paired: Paired F- or t-test'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -288,6 +317,16 @@ es_from_paired_f_pval <- function(paired_f_pval_exp, paired_f_pval_nexp, n_exp, 
   r_pre_post_nexp[is.na(r_pre_post_nexp)] <- 0.5
   if (missing(r_pre_post_exp)) r_pre_post_exp <- rep(0.5, length(paired_f_pval_exp))
   r_pre_post_exp[is.na(r_pre_post_exp)] <- 0.5
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, paired_f_pval_exp, paired_f_pval_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "and p-values ",
+                                              "should be >0."),
+                       func = "es_from_paired_f_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   es <- es_from_paired_t_pval(
     paired_t_pval_exp = paired_f_pval_exp,

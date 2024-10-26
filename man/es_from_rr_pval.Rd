@@ -2,7 +2,7 @@
 % Please edit documentation in R/es_from_stand_RR.R
 \name{es_from_rr_pval}
 \alias{es_from_rr_pval}
-\title{Convert a risk ratio value and its p-value to three effect measures (SMD, OR, COR)}
+\title{Convert a risk ratio value and its p-value to various effect size measures}
 \usage{
 es_from_rr_pval(
   rr,
@@ -50,12 +50,12 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + NNT\cr
 \tab \cr
 \code{required input data} \tab See 'Section 3. Risk Ratio'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }
 \description{
-Convert a risk ratio value and its p-value to three effect measures (SMD, OR, COR)
+Convert a risk ratio value and its p-value to various effect size measures
 }
 \details{
 This function uses the p-value of the (log) risk ratio to obtain the standard error (Section 6.3.2 in the Cochrane Handbook).

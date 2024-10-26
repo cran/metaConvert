@@ -17,7 +17,7 @@
 #' by Lipsey et al. (2001) as well as by our own calculations.
 #'
 #' **To estimate the OR, RR, NNT,**,
-#' this function reconstructs a 2x2 table (using the approach proposed by Viecthbauer, 2023).
+#' this function reconstructs a 2x2 table (using the approach proposed by Viechtbauer, 2023).
 #'
 #' Then, the calculations of the \code{\link{es_from_2x2}()} function are applied.
 #'
@@ -47,7 +47,7 @@
 #'  \code{converted effect size measure} \tab D + G + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 8. Phi or chi-square'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -74,6 +74,15 @@ es_from_phi <- function(phi, n_cases, n_exp,
   if (length(reverse_phi) == 1) reverse_phi = c(rep(reverse_phi, length(phi)))
   if (length(reverse_phi) != length(phi)) stop("The length of the 'reverse_phi' argument of incorrectly specified.")
 
+  tryCatch({
+    .validate_positive(n_cases, n_exp, n_sample,
+                       error_message = paste0("The number of cases, people exposed, total sample ",
+                                              "should be >0."),
+                       func = "es_from_phi")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
   cont_table <- suppressWarnings(
     metafor::conv.2x2(
       ri = phi, ni = n_sample,
@@ -88,24 +97,24 @@ es_from_phi <- function(phi, n_cases, n_exp,
     reverse_2x2 = reverse_phi
   )
 
-  miss_d = which(is.na(es$d))
-
-  es$d[miss_d] <- (2 * phi[miss_d]) / sqrt(1 - phi[miss_d]^2)
-  X2 <- phi^2 * n_sample
-  es$d_se[miss_d] = sqrt(es$d[miss_d]^2 / X2[miss_d])
-  res_d <- .es_from_d(d = es$d, d_se = es$d_se, n_sample = n_sample, reverse = reverse_phi)
-  cols_d <- c("d", "d_se", "d_ci_lo", "d_ci_up",
-             "g", "g_se", "g_ci_lo", "g_ci_up")
-  es[miss_d, cols_d] <- res_d[miss_d, cols_d]
-  es$r <- ifelse(reverse_phi, -phi, phi)
-  es$z <- atanh(es$r)
-  es$z_se <- sqrt(es$z^2 / X2)
-  es$z_ci_lo <- es$z - qnorm(.975) * es$z_se
-  es$z_ci_up <- es$z + qnorm(.975) * es$z_se
-  es$r_ci_lo <- tanh(es$z_ci_lo)
-  es$r_ci_lo <- tanh(es$z_ci_up)
-  effective_n = 1/(es$z_se^2) + 3
-  es$r_se = sqrt((1 - es$r^2)^2 / (effective_n - 1))
+  # miss_d = which(is.na(es$d))
+  #
+  # es$d[miss_d] <- (2 * phi[miss_d]) / sqrt(1 - phi[miss_d]^2)
+  # X2 <- phi^2 * n_sample
+  # es$d_se[miss_d] = sqrt(es$d[miss_d]^2 / X2[miss_d])
+  # res_d <- .es_from_d(d = es$d, d_se = es$d_se, n_sample = n_sample, reverse = reverse_phi)
+  # cols_d <- c("d", "d_se", "d_ci_lo", "d_ci_up",
+  #            "g", "g_se", "g_ci_lo", "g_ci_up")
+  # es[miss_d, cols_d] <- res_d[miss_d, cols_d]
+  # es$r <- ifelse(reverse_phi, -phi, phi)
+  # es$z <- atanh(es$r)
+  # es$z_se <- sqrt(es$z^2 / X2)
+  # es$z_ci_lo <- es$z - qnorm(.975) * es$z_se
+  # es$z_ci_up <- es$z + qnorm(.975) * es$z_se
+  # es$r_ci_lo <- tanh(es$z_ci_lo)
+  # es$r_ci_up <- tanh(es$z_ci_up)
+  # effective_n = 1/(es$z_se^2) + 3
+  # es$r_se = sqrt((1 - es$r^2)^2 / (effective_n - 1))
 
   es$info_used <- "phi"
 
@@ -124,7 +133,7 @@ es_from_phi <- function(phi, n_cases, n_exp,
 #' @details
 #' This function converts a chi-square value (with one degree of freedom)
 #' into a phi coefficient (Lipsey et al. 2001):
-#' \deqn{phi = chisq * \sqrt{\frac{chisq}{n\_sample}}}.
+#' \deqn{phi = \sqrt{\frac{chisq^2}{n\_sample}}}.
 #'
 #' Note that if \code{yates_chisq = "TRUE"}, a small correction is added.
 #'
@@ -142,7 +151,7 @@ es_from_phi <- function(phi, n_cases, n_exp,
 #'  \code{converted effect size measure} \tab D + G + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 8. Phi or chi-square'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -164,6 +173,15 @@ es_from_chisq <- function(chisq, n_sample, n_cases, n_exp,
   if (length(reverse_chisq) == 1) reverse_chisq = c(rep(reverse_chisq, length(chisq)))
   if (length(reverse_chisq) != length(chisq)) stop("The length of the 'reverse_chisq' argument of incorrectly specified.")
 
+  tryCatch({
+    .validate_positive(n_cases, n_exp, n_sample, chisq,
+                       error_message = paste0("The chi-square, number of cases, people exposed, total sample ",
+                                              "should be >0."),
+                       func = "es_from_chisq")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
   cont_table <- suppressWarnings(
     metafor::conv.2x2(
       x2i = chisq, ni = n_sample,
@@ -180,25 +198,25 @@ es_from_chisq <- function(chisq, n_sample, n_cases, n_exp,
     reverse_2x2 = reverse_chisq
   )
 
-  miss_d = which(is.na(es$d))
-
-  es$d[miss_d] <- 2 * sqrt(chisq[miss_d] / (n_sample[miss_d] - chisq[miss_d]))
-  es$d_se[miss_d] = sqrt(es$d[miss_d]^2 / chisq[miss_d])
-  res_d <- .es_from_d(d = es$d, d_se = es$d_se,
-                      n_sample = n_sample, reverse = reverse_chisq)
-  cols_d <- c("d", "d_se", "d_ci_lo", "d_ci_up",
-              "g", "g_se", "g_ci_lo", "g_ci_up")
-  es[miss_d, cols_d] <- res_d[miss_d, cols_d]
-  es$r <- sqrt(chisq/n_sample)
-  es$r <- ifelse(reverse_chisq, -es$r, es$r)
-  es$z <- atanh(es$r)
-  es$z_se <- sqrt(es$z^2 / chisq)
-  es$z_ci_lo <- es$z - qnorm(.975) * es$z_se
-  es$z_ci_up <- es$z + qnorm(.975) * es$z_se
-  es$r_ci_lo <- tanh(es$z_ci_lo)
-  es$r_ci_lo <- tanh(es$z_ci_up)
-  effective_n = 1/(es$z_se^2) + 3
-  es$r_se = sqrt((1 - es$r^2)^2 / (effective_n - 1))
+  # miss_d = which(is.na(es$d))
+  #
+  # es$d[miss_d] <- 2 * sqrt(chisq[miss_d] / (n_sample[miss_d] - chisq[miss_d]))
+  # es$d_se[miss_d] = sqrt(es$d[miss_d]^2 / chisq[miss_d])
+  # res_d <- .es_from_d(d = es$d, d_se = es$d_se,
+  #                     n_sample = n_sample, reverse = reverse_chisq)
+  # cols_d <- c("d", "d_se", "d_ci_lo", "d_ci_up",
+  #             "g", "g_se", "g_ci_lo", "g_ci_up")
+  # es[miss_d, cols_d] <- res_d[miss_d, cols_d]
+  # es$r <- sqrt(chisq/n_sample)
+  # es$r <- ifelse(reverse_chisq, -es$r, es$r)
+  # es$z <- atanh(es$r)
+  # es$z_se <- sqrt(es$z^2 / chisq)
+  # es$z_ci_lo <- es$z - qnorm(.975) * es$z_se
+  # es$z_ci_up <- es$z + qnorm(.975) * es$z_se
+  # es$r_ci_lo <- tanh(es$z_ci_lo)
+  # es$r_ci_lo <- tanh(es$z_ci_up)
+  # effective_n = 1/(es$z_se^2) + 3
+  # es$r_se = sqrt((1 - es$r^2)^2 / (effective_n - 1))
 
   es$info_used <- "chisq"
 
@@ -235,7 +253,7 @@ es_from_chisq <- function(chisq, n_sample, n_cases, n_exp,
 #'  \code{converted effect size measure} \tab D + G + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 8. Phi or chi-square'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -250,6 +268,15 @@ es_from_chisq_pval <- function(chisq_pval, n_sample, n_cases, n_exp,
                                reverse_chisq_pval) {
   if (missing(reverse_chisq_pval)) reverse_chisq_pval <- rep(FALSE, length(chisq_pval))
   reverse_chisq_pval[is.na(reverse_chisq_pval)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_cases, n_exp, n_sample, chisq_pval,
+                       error_message = paste0("The chi-square p-value, number of cases, people exposed, total sample ",
+                                              "should be >0."),
+                       func = "es_from_chisq_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   chisq <- stats::qchisq(p = chisq_pval, df = 1, lower.tail = FALSE)
 

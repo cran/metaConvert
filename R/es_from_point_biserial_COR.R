@@ -28,12 +28,12 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 11. ANOVA statistics, Student's t-test, or point-bis correlation'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
 #' @references
-#' Vietchbauer (2021). Accessed at: https://stats.stackexchange.com/questions/526789/convert-correlation-r-to-cohens-d-unequal-groups-of-known-size
+#' Viechtbauer (2021). Accessed at: https://stats.stackexchange.com/questions/526789/convert-correlation-r-to-cohens-d-unequal-groups-of-known-size
 #'
 #' @export es_from_pt_bis_r
 #'
@@ -46,6 +46,15 @@ es_from_pt_bis_r <- function(pt_bis_r, n_exp, n_nexp, smd_to_cor = "viechtbauer"
   reverse_pt_bis_r[is.na(reverse_pt_bis_r)] <- FALSE
   if (length(reverse_pt_bis_r) == 1) reverse_pt_bis_r = c(rep(reverse_pt_bis_r, length(pt_bis_r)))
   if (length(reverse_pt_bis_r) != length(pt_bis_r)) stop("The length of the 'reverse_pt_bis_r' argument is incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed, ",
+                                              "should be >0."),
+                       func = "es_from_pt_bis_r")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   df <- n_exp + n_nexp - 2
   h <- df / n_exp + df / n_nexp
@@ -86,7 +95,7 @@ es_from_pt_bis_r <- function(pt_bis_r, n_exp, n_nexp, smd_to_cor = "viechtbauer"
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 11. ANOVA statistics, Student's t-test, or point-bis correlation'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -103,6 +112,15 @@ es_from_pt_bis_r_pval <- function(pt_bis_r_pval, n_exp, n_nexp,
                                   smd_to_cor = "viechtbauer", reverse_pt_bis_r_pval) {
   if (missing(reverse_pt_bis_r_pval)) reverse_pt_bis_r_pval <- rep(FALSE, length(n_exp))
   reverse_pt_bis_r_pval[is.na(reverse_pt_bis_r_pval)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed, and p-values ",
+                                              "should be >0."),
+                       func = "es_from_pt_bis_r_pval")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   t <- qt(p = pt_bis_r_pval / 2, df = n_exp + n_nexp - 2, lower.tail = FALSE)
 

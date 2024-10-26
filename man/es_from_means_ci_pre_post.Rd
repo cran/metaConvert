@@ -23,6 +23,7 @@ es_from_means_ci_pre_post(
   r_pre_post_nexp,
   smd_to_cor = "viechtbauer",
   pre_post_to_smd = "bonett",
+  max_asymmetry = 10,
   reverse_means_pre_post
 )
 }
@@ -63,6 +64,8 @@ es_from_means_ci_pre_post(
 
 \item{pre_post_to_smd}{formula used to convert the pre and post means/SD into a SMD (see details).}
 
+\item{max_asymmetry}{A percentage indicating the tolerance before detecting asymmetry in the 95\% CI bounds.}
+
 \item{reverse_means_pre_post}{a logical value indicating whether the direction of generated effect sizes should be flipped.}
 }
 \value{
@@ -74,7 +77,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 15. Paired: pre-post means and dispersion'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

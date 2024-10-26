@@ -15,6 +15,7 @@ es_from_ancova_means_ci(
   ancova_mean_ci_up_nexp,
   cov_outcome_r,
   n_cov_ancova,
+  max_asymmetry = 10,
   smd_to_cor = "viechtbauer",
   reverse_ancova_means
 )
@@ -40,6 +41,8 @@ es_from_ancova_means_ci(
 
 \item{n_cov_ancova}{number of covariates in the ANCOVA model.}
 
+\item{max_asymmetry}{A percentage indicating the tolerance before detecting asymmetry in the 95\% CI bounds.}
+
 \item{smd_to_cor}{formula used to convert the adjusted \code{cohen_d} value into a coefficient correlation (see details).}
 
 \item{reverse_ancova_means}{a logical value indicating whether the direction of the generated effect sizes should be flipped.}
@@ -53,7 +56,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 19. Adjusted: Means and dispersion'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }

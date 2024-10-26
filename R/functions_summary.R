@@ -151,7 +151,7 @@
 #'   convert_df(df.haza, measure = "g"),
 #'   digits = 5)
 summary.metaConvert <- function(object, digits = 3, ...) {
-  # object = convert_df(dat, verbose = FALSE,
+  # object = convert_df(df.haza, verbose = FALSE,
   #                     or_to_rr = "dipietrantonj", measure="d")
   # digits = 3
   # object = convert_df(subset(df.haza, !is.na(n_cases_exp) & !is.na(n_cases_nexp) &
@@ -191,10 +191,14 @@ summary.metaConvert <- function(object, digits = 3, ...) {
   # rio::export(list_order, "list_possible_inputs.xlsx")
 
   # hierarchy indicated by user
-  ordering_raw <- gsub(" ", "", unlist(strsplit(hierarchy, split = ">", fixed = TRUE)))
+  if (es_selected == "auto") {
+    ordering_full <- list_order
+  } else {
+    ordering_raw <- gsub(" ", "", unlist(strsplit(hierarchy, split = ">", fixed = TRUE)))
+    ordering_full <- append(ordering_raw, list_order[!list_order %in% ordering_raw])
+  }
 
   # append the user hierarchy with all information
-  ordering_full <- append(ordering_raw, list_order[!list_order %in% ordering_raw])
 
   # warn users if wrong inputs have been indicated in the hierarchy
   if (hierarchy == "hierarchy" & length(ordering_full[!ordering_full %in% list_order] > 0)) {

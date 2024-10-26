@@ -2,12 +2,12 @@
 % Please edit documentation in R/main_aggregate_df.R
 \name{aggregate_df}
 \alias{aggregate_df}
-\title{Aggregate a dataframe containing dependent effect sizes according to Borenstein's formulas}
+\title{Aggregate a dataframe containing dependent effect sizes}
 \usage{
 aggregate_df(
   x,
   dependence = "outcomes",
-  cor_outcomes = 0.8,
+  cor_unit = 0.8,
   agg_fact,
   es = "es",
   se = "se",
@@ -26,7 +26,7 @@ aggregate_df(
 
 \item{dependence}{The type of dependence in your dataframe (can be either "outcomes" or "subgroups"). See details.}
 
-\item{cor_outcomes}{The correlation between effect sizes coming from the same clustering unit (only used when \code{dependence = "outcomes"}).}
+\item{cor_unit}{The correlation between effect sizes coming from the same clustering unit (only used when \code{dependence = "times"} or \code{dependence = "outcomes"}).}
 
 \item{agg_fact}{A character string identifying the column name that contains the clustering units (all rows with the same \code{agg_fact} value will be aggregated together).}
 
@@ -66,11 +66,12 @@ will also be included in this dataframe.
 }
 }
 \description{
-Aggregate a dataframe containing dependent effect sizes according to Borenstein's formulas
+Aggregate a dataframe containing dependent effect sizes
 }
 \details{
 \enumerate{
-\item In the \code{dependence} argument, you should indicate "outcomes" if the dependence within the same clustering unit (e.g., study) is due to the presence of multiple effect sizes produced from the same participants (e.g., multiple outcomes, or multiple time-points)
+\item In the \code{dependence} argument, you should indicate "outcomes" if the dependence within the same clustering unit (e.g., study) is due to the presence of multiple effect sizes produced from the same participants at the same time-point (e.g., multiple outcome measures)
+\item In the \code{dependence} argument, you should indicate "times" if the dependence within the same clustering unit (e.g., study) is due to the presence of multiple effect sizes produced from the same participants at the different time-points (e.g., an RCT with several follow-up waves).
 \item In the \code{dependence} argument, you should indicate "subgroups" if the dependence within the same clustering unit (e.g., study) is due to the presence of multiple effect sizes produced by independent subgroups (e.g., one effect size for boys, and one for girls).
 }
 
@@ -80,7 +81,7 @@ is presented on the log scale.
 }
 \examples{
 res <- summary(convert_df(df.haza, measure = "d"))
-aggregate_df(res, dependence = "outcomes", cor_outcomes = 0.8,
+aggregate_df(res, dependence = "outcomes", cor_unit = 0.8,
              agg_fact = "study_id", es = "es_crude", se = "se_crude",
              col_fact = c("outcome", "type_publication"))
 

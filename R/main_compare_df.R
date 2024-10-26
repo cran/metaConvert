@@ -32,12 +32,11 @@
 #' @examples
 #' df.compare1 = df.compare1[order(df.compare1$author), ]
 #' df.compare2 = df.compare2[order(df.compare2$year), ]
-#' names(df.compare1)[2] <- "generate_warning"
 #'
 #' compare_df(
 #'   df_extractor_1 = df.compare1,
 #'   df_extractor_2 = df.compare2,
-#'   ordering_columns = c("study_id")
+#'   ordering_columns = c("author", "year")
 #' )
 
 compare_df <- function(df_extractor_1, df_extractor_2,
@@ -50,6 +49,7 @@ compare_df <- function(df_extractor_1, df_extractor_2,
   df_extractor_1 = data.frame(df_extractor_1)
   df_extractor_2 = data.frame(df_extractor_2)
 
+
   cols_available = unique(append(names(df_extractor_1), names(df_extractor_2)))
   cols_retained = intersect(names(df_extractor_1), names(df_extractor_2))
   cols_unique = cols_available[!cols_available %in% cols_retained]
@@ -58,16 +58,60 @@ compare_df <- function(df_extractor_1, df_extractor_2,
             " were removed from the comparison since they were included only in one of the two datasets.\n")
   }
 
+  if (!is.null(ordering_columns)) {
+    if (!all(ordering_columns %in% cols_retained)) {
+      stop("The ordering columns should be present in the two datasets")
+    } else if (length(ordering_columns) > 1) {
+
+      create_unique_id <- function(df, columns) {
+        do.call(paste, c(df[, columns, drop = FALSE], sep = "_"))
+      }
+
+      df_extractor_1$ID_metaConvert <- create_unique_id(df_extractor_1, ordering_columns)
+      df_extractor_2$ID_metaConvert <- create_unique_id(df_extractor_2, ordering_columns)
+
+      ordering_columns = "ID_metaConvert"
+      cols_retained = append(cols_retained, ordering_columns)
+
+    }
+  }
+
+
 
   if (!is.null(ordering_columns)) {
     df_extractor_1 = suppressWarnings(df_extractor_1[order(df_extractor_1[, ordering_columns]), cols_retained])
     df_extractor_2 = suppressWarnings(df_extractor_2[order(df_extractor_2[, ordering_columns]), cols_retained])
+
+    combined_values <- unique(c(df_extractor_1[, ordering_columns], df_extractor_2[, ordering_columns]))
+    combined_values <- combined_values[order(combined_values)]
+
+    insert_blank_rows <- function(df, combined_values, ordering_columns) {
+      new_df <- data.frame(matrix(ncol = ncol(df), nrow = length(combined_values)))
+      colnames(new_df) <- colnames(df)
+
+      for (i in seq_along(combined_values)) {
+        match_row <- which(df[, ordering_columns] == combined_values[i])
+        if (length(match_row) > 0) {
+          new_df[i, ] <- df[match_row, ]
+        }
+      }
+
+      return(new_df)
+    }
+
+    # Apply the function to both dataframes
+    df_extractor_1 <- insert_blank_rows(df_extractor_1, combined_values, ordering_columns)
+    df_extractor_2 <- insert_blank_rows(df_extractor_2, combined_values, ordering_columns)
+    df_extractor_1$rowname <- 1:nrow(df_extractor_1)
+    df_extractor_2$rowname <- 1:nrow(df_extractor_2)
+
     } else {
     df_extractor_1 = df_extractor_1[, cols_retained]
     df_extractor_2 = df_extractor_2[, cols_retained]
-  }
-  df_extractor_1$rowname <- 1:nrow(df_extractor_1)
-  df_extractor_2$rowname <- 1:nrow(df_extractor_2)
+    df_extractor_1$rowname <- 1:nrow(df_extractor_1)
+    df_extractor_2$rowname <- 1:nrow(df_extractor_2)
+    }
+
 
   comp <- suppressMessages(compareDF::compare_df(
     df_new = df_extractor_1,

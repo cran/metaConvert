@@ -32,7 +32,7 @@ This function estimates and converts between several effect size measures.
 \code{converted effect size measure} \tab OR + R + Z \cr
 \tab \cr
 \code{required input data} \tab See 'Section 11. ANOVA statistics, Student's t-test, or point-bis correlation'\cr
-\tab https://metaconvert.org/html/input.html\cr
+\tab https://metaconvert.org/input.html\cr
 \tab \cr
 }
 }
@@ -56,5 +56,5 @@ calculations of the \code{\link{es_from_cohen_d}()} are applied.
 es_from_pt_bis_r(pt_bis_r = 0.2, n_exp = 121, n_nexp = 121)
 }
 \references{
-Vietchbauer (2021). Accessed at: https://stats.stackexchange.com/questions/526789/convert-correlation-r-to-cohens-d-unequal-groups-of-known-size
+Viechtbauer (2021). Accessed at: https://stats.stackexchange.com/questions/526789/convert-correlation-r-to-cohens-d-unequal-groups-of-known-size
 }

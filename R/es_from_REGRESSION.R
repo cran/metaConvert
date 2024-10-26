@@ -27,7 +27,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 13. (Un-)Standardized regression coefficient'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -48,6 +48,16 @@ es_from_beta_std <- function(beta_std, sd_dv, n_exp, n_nexp,
   if (length(reverse_beta_std) != length(beta_std)) stop("The length of the 'reverse_beta_std' argument is incorrectly specified.")
 
   beta_std <- ifelse(reverse_beta_std, -beta_std, beta_std)
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed, and standard deviation of the outcome ",
+                                              "should be >0."),
+                       func = "es_from_beta_std")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
 
   sd_dummy <- sqrt((n_exp - (n_exp^2 / (n_exp + n_nexp))) / (n_exp + n_nexp - 1))
 
@@ -95,7 +105,7 @@ es_from_beta_std <- function(beta_std, sd_dv, n_exp, n_nexp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 13. (Un-)Standardized regression coefficient'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -112,6 +122,16 @@ es_from_beta_unstd <- function(beta_unstd, sd_dv, n_exp, n_nexp,
                                smd_to_cor = "viechtbauer", reverse_beta_unstd) {
   if (missing(reverse_beta_unstd)) reverse_beta_unstd <- rep(FALSE, length(beta_unstd))
   reverse_beta_unstd[is.na(reverse_beta_unstd)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed, and standard deviation of the outcome ",
+                                              "should be >0."),
+                       func = "es_from_beta_unstd")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
 
   sd_pooled <- suppressWarnings(
     sqrt(abs(((sd_dv^2 * (n_exp + n_nexp - 1)) - (beta_unstd^2 * ((n_exp * n_nexp) / (n_exp + n_nexp)))) /

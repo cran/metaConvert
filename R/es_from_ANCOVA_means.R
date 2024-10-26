@@ -45,7 +45,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 19. Adjusted: Means and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -73,6 +73,18 @@ es_from_ancova_means_sd <- function(n_exp, n_nexp,
   reverse_ancova_means[is.na(reverse_ancova_means)] <- FALSE
   if (length(reverse_ancova_means) == 1) reverse_ancova_means = c(rep(reverse_ancova_means, length(ancova_mean_exp)))
   if (length(reverse_ancova_means) != length(ancova_mean_exp)) stop("The length of the 'reverse_ancova_means' argument of incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       ancova_mean_sd_exp, ancova_mean_sd_nexp,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, ANCOVA SDs ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_means_sd")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   df <- n_exp + n_nexp - 2 - n_cov_ancova
   ancova_mean_sd_pooled <- sqrt(((n_exp - 1) * ancova_mean_sd_exp^2 +
@@ -131,7 +143,7 @@ es_from_ancova_means_sd <- function(n_exp, n_nexp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 19. Adjusted: Means and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -156,8 +168,24 @@ es_from_ancova_means_se <- function(n_exp, n_nexp,
                                     smd_to_cor = "viechtbauer", reverse_ancova_means) {
   if (missing(reverse_ancova_means)) reverse_ancova_means <- rep(FALSE, length(ancova_mean_exp))
   reverse_ancova_means[is.na(reverse_ancova_means)] <- FALSE
+
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       ancova_mean_se_exp, ancova_mean_se_nexp,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, ANCOVA SEs ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_means_se")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
+
   ancova_mean_sd_exp <- ancova_mean_se_exp * sqrt(n_exp)
   ancova_mean_sd_nexp <- ancova_mean_se_nexp * sqrt(n_nexp)
+
 
   es <- es_from_ancova_means_sd(
     n_exp = n_exp, n_nexp = n_nexp,
@@ -184,6 +212,7 @@ es_from_ancova_means_se <- function(n_exp, n_nexp,
 #' @param n_exp number of participants in the experimental/exposed group.
 #' @param n_nexp number of participants in the non-experimental/non-exposed group.
 #' @param smd_to_cor formula used to convert the adjusted \code{cohen_d} value into a coefficient correlation (see details).
+#' @param max_asymmetry A percentage indicating the tolerance before detecting asymmetry in the 95% CI bounds.
 #' @param reverse_ancova_means a logical value indicating whether the direction of the generated effect sizes should be flipped.
 #'
 #' @details
@@ -205,7 +234,7 @@ es_from_ancova_means_se <- function(n_exp, n_nexp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 19. Adjusted: Means and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -226,9 +255,35 @@ es_from_ancova_means_ci <- function(n_exp, n_nexp,
                                     ancova_mean_exp, ancova_mean_ci_lo_exp, ancova_mean_ci_up_exp,
                                     ancova_mean_nexp, ancova_mean_ci_lo_nexp, ancova_mean_ci_up_nexp,
                                     cov_outcome_r, n_cov_ancova,
+                                    max_asymmetry = 10,
                                     smd_to_cor = "viechtbauer", reverse_ancova_means) {
   if (missing(reverse_ancova_means)) reverse_ancova_means <- rep(FALSE, length(ancova_mean_exp))
   reverse_ancova_means[is.na(reverse_ancova_means)] <- FALSE
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_means_ci")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+  tryCatch({
+    .validate_ci_symmetry(ancova_mean_exp, ancova_mean_ci_lo_exp, ancova_mean_ci_up_exp,
+                          func = "es_from_ancova_means_ci",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
+  tryCatch({
+    .validate_ci_symmetry(ancova_mean_nexp, ancova_mean_ci_lo_nexp, ancova_mean_ci_up_nexp,
+                          func = "es_from_ancova_means_ci",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
 
   df_exp <- n_exp - 1
   df_nexp <- n_nexp - 1
@@ -281,7 +336,7 @@ es_from_ancova_means_ci <- function(n_exp, n_nexp,
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 19. Adjusted: Means and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -307,6 +362,17 @@ es_from_ancova_means_sd_pooled_adj <- function(ancova_mean_exp, ancova_mean_nexp
   reverse_ancova_means[is.na(reverse_ancova_means)] <- FALSE
   if (length(reverse_ancova_means) == 1) reverse_ancova_means = c(rep(reverse_ancova_means, length(ancova_mean_exp)))
   if (length(reverse_ancova_means) != length(ancova_mean_exp)) stop("The length of the 'reverse_ancova_means' argument of incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, ancova_mean_sd_pooled,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, ANCOVA pooled SD ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_means_sd_pooled_adj")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   sd_within <- ancova_mean_sd_pooled / sqrt(1 - cov_outcome_r^2)
 
@@ -367,7 +433,7 @@ es_from_ancova_means_sd_pooled_adj <- function(ancova_mean_exp, ancova_mean_nexp
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 19. Adjusted: Means and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -391,6 +457,17 @@ es_from_ancova_means_sd_pooled_crude <- function(ancova_mean_exp, ancova_mean_ne
   reverse_ancova_means[is.na(reverse_ancova_means)] <- FALSE
   if (length(reverse_ancova_means) == 1) reverse_ancova_means = c(rep(reverse_ancova_means, length(ancova_mean_exp)))
   if (length(reverse_ancova_means) != length(ancova_mean_exp)) stop("The length of the 'reverse_ancova_means' argument of incorrectly specified.")
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, mean_sd_pooled,
+                       cov_outcome_r, n_cov_ancova,
+                       error_message = paste0("The number of people exposed/non-exposed, pooled SD ",
+                                              "as well as the correlation and number of covariates in ANCOVA ",
+                                              "should be >0."),
+                       func = "es_from_ancova_means_sd_pooled_crude")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   d <- (ancova_mean_exp - ancova_mean_nexp) / mean_sd_pooled
 

@@ -57,7 +57,7 @@
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 15. Paired: pre-post means and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -91,6 +91,15 @@ es_from_means_sd_pre_post <- function(mean_pre_exp, mean_exp, mean_pre_sd_exp, m
       "Possible inputs are: 'bonett' or 'cooper'"
     ))
   }
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, mean_pre_sd_exp, mean_pre_sd_nexp, mean_sd_exp, mean_sd_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed and standard deviations ",
+                                              "should be >0."),
+                       func = "es_from_means_sd_pre_post")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
 
   if (missing(reverse_means_pre_post)) reverse_means_pre_post <- rep(FALSE, length(mean_pre_exp))
   reverse_means_pre_post[is.na(reverse_means_pre_post)] <- FALSE
@@ -215,7 +224,7 @@ es_from_means_sd_pre_post <- function(mean_pre_exp, mean_exp, mean_pre_sd_exp, m
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 15. Paired: pre-post means and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -246,6 +255,16 @@ es_from_means_se_pre_post <- function(mean_pre_exp, mean_exp, mean_pre_se_exp, m
       "Possible inputs are: 'bonett' or 'cooper'"
     ))
   }
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp, mean_pre_se_exp, mean_pre_se_nexp, mean_se_exp, mean_se_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed and standard errors ",
+                                              "should be >0."),
+                       func = "es_from_means_se_pre_post")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
 
   if (missing(reverse_means_pre_post)) reverse_means_pre_post <- rep(FALSE, length(mean_pre_exp))
   reverse_means_pre_post[is.na(reverse_means_pre_post)] <- FALSE
@@ -295,6 +314,7 @@ es_from_means_se_pre_post <- function(mean_pre_exp, mean_exp, mean_pre_se_exp, m
 #' @param r_pre_post_exp pre-post correlation in the experimental/exposed group
 #' @param r_pre_post_nexp pre-post correlation in the non-experimental/non-exposed group
 #' @param pre_post_to_smd formula used to convert the pre and post means/SD into a SMD (see details).
+#' @param max_asymmetry A percentage indicating the tolerance before detecting asymmetry in the 95% CI bounds.
 #' @param smd_to_cor formula used to convert the \code{cohen_d} value into a coefficient correlation (see details).
 #' @param reverse_means_pre_post a logical value indicating whether the direction of generated effect sizes should be flipped.
 #'
@@ -321,7 +341,7 @@ es_from_means_se_pre_post <- function(mean_pre_exp, mean_exp, mean_pre_se_exp, m
 #'  \code{converted effect size measure} \tab OR + R + Z \cr
 #'  \tab \cr
 #'  \code{required input data} \tab See 'Section 15. Paired: pre-post means and dispersion'\cr
-#'  \tab https://metaconvert.org/html/input.html\cr
+#'  \tab https://metaconvert.org/input.html\cr
 #'  \tab \cr
 #' }
 #'
@@ -352,7 +372,7 @@ es_from_means_ci_pre_post <- function(mean_pre_exp, mean_exp,
                                       mean_ci_lo_nexp, mean_ci_up_nexp,
                                       n_exp, n_nexp, r_pre_post_exp, r_pre_post_nexp,
                                       smd_to_cor = "viechtbauer",
-                                      pre_post_to_smd = "bonett",
+                                      pre_post_to_smd = "bonett", max_asymmetry = 10,
                                       reverse_means_pre_post) {
 
   if (missing(reverse_means_pre_post)) reverse_means_pre_post <- rep(FALSE, length(mean_pre_exp))
@@ -361,6 +381,45 @@ es_from_means_ci_pre_post <- function(mean_pre_exp, mean_exp,
   r_pre_post_nexp[is.na(r_pre_post_nexp)] <- 0.5
   if (missing(r_pre_post_exp)) r_pre_post_exp <- rep(0.5, length(mean_pre_exp))
   r_pre_post_exp[is.na(r_pre_post_exp)] <- 0.5
+
+  tryCatch({
+    .validate_positive(n_exp, n_nexp,
+                       error_message = paste0("The number of people exposed/non-exposed ",
+                                              "should be >0."),
+                       func = "es_from_means_ci_pre_post")
+  }, error = function(e) {
+    stop("Data entry error: ", conditionMessage(e), "\n")
+  })
+
+  tryCatch({
+    .validate_ci_symmetry(mean_exp, mean_ci_lo_exp, mean_ci_up_exp,
+                          func = "es_from_means_ci_pre_post",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
+  tryCatch({
+    .validate_ci_symmetry(mean_nexp, mean_ci_lo_nexp, mean_ci_up_nexp,
+                          func = "es_from_means_ci_pre_post",
+                          max_asymmetry_percent = max_asymmetry)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
+
+  tryCatch({
+    .validate_ci_symmetry(mean_pre_exp, mean_pre_ci_lo_exp, mean_pre_ci_up_exp,
+                          func = "es_from_means_ci_pre_post",
+                          max_asymmetry_percent = 5)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
+  tryCatch({
+    .validate_ci_symmetry(mean_pre_nexp, mean_pre_ci_lo_nexp, mean_pre_ci_up_nexp,
+                          func = "es_from_means_ci_pre_post",
+                          max_asymmetry_percent = 5)
+  }, error = function(e) {
+    stop("Validation failed: ", conditionMessage(e), "\n")
+  })
 
   df_exp <- n_exp - 1
   df_nexp <- n_nexp - 1
