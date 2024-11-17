@@ -669,7 +669,7 @@ data_extraction_sheet <- function(measure = c("d", "g", "md", "or", "rr", "nnt",
 
 see_input_data <- function(measure = c("all", "d", "g", "md", "or", "rr", "nnt",
                                             "r", "z", "logvr", "logcvr", "irr"),
-                          type_of_measure = c("natural+converted", "natural"),
+                          type_of_measure = c("natural", "natural+converted"),
                           name = "mcv_input_data",
                           extension = c("data.frame", ".txt", ".csv", ".xlsx"),
                           verbose = TRUE) {
@@ -1077,7 +1077,7 @@ see_input_data <- function(measure = c("all", "d", "g", "md", "or", "rr", "nnt",
                 "OR+RR+NNT", "D+G+R+Z",
                 "Non-adjusted")
   dat[dat$hierarch_name == "2x2_prop",
-      2:7] <- c("Proportion of participants 'developping the disease' and row marginal sums",
+      2:7] <- c("Proportion of participants 'developping the disease' and row marginal proportions",
                 "Section 7. https://metaconvert.org/html/input.html",
                 "es_from_2x2_prop()",
                 "OR+RR+NNT", "D+G+R+Z",

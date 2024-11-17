@@ -69,7 +69,7 @@ see_input_data(measure = "or")
 ```
 
 ```{r, echo=FALSE}
-DT::datatable(see_input_data(measure = "or", extension="data.frame"), options = list(  
+DT::datatable(see_input_data(measure = "or", type_of_measure = "natural", extension="data.frame"), options = list(  
     scrollX = TRUE,
     dom = c('t'),
     scrollY = "300px", 
@@ -114,8 +114,17 @@ compare_df(
     output = "html")
 ```
 
-Only rows with differences between the two datasets are identified, and you can easily retrieve the row number by looking at the ID in the rowname column. 
 In grey, values that are consistent between the two data extractors. In green/red, the values that differ.  
+
+Only rows with differences between the two datasets are identified, and you can easily retrieve the row number by looking at the ID in the rowname column. If your dataset have rows in a different order (like in the example above), you can automatically reorder your datasets by indicating to the function the columns that store this information
+
+```{r, message=FALSE, fig.width= 11}
+compare_df(
+    df_extractor_1 = df.compare1,
+    df_extractor_2 = df.compare2,
+    ordering_columns = c("author", "year"),
+    output = "html")
+```
 
 
 # Step 3. Effect size computation

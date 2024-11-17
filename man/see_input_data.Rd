@@ -7,7 +7,7 @@
 see_input_data(
   measure = c("all", "d", "g", "md", "or", "rr", "nnt", "r", "z", "logvr", "logcvr",
     "irr"),
-  type_of_measure = c("natural+converted", "natural"),
+  type_of_measure = c("natural", "natural+converted"),
   name = "mcv_input_data",
   extension = c("data.frame", ".txt", ".csv", ".xlsx"),
   verbose = TRUE

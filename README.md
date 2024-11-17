@@ -3,12 +3,16 @@
 
 # metaConvert
 
-<!-- badges: start 
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://www.tidyverse.org/lifecycle/#stable)
-[![CRAN status](https://www.r-pkg.org/badges/version/ggbump)](https://CRAN.R-project.org/package=metaConvert)
-[![License: GPL (>=3)](https://img.shields.io/badge/license-GPL-red)](https://www.gnu.org/licenses/gpl-3.0.html)
-[![CRAN Version](https://www.r-pkg.org/badges/version/metaConvert)](https://cran.r-project.org/package=metaConvert)
-badges: end -->
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/metaConvert)](https://CRAN.R-project.org/package=metaConvert)
+[![License: GPL
+(\>=3)](https://img.shields.io/badge/license-GPL%20%28%3E%3D3%29-red.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+<br> [![Monthly
+downloads](https://cranlogs.r-pkg.org/badges/metaConvert)](https://cran.r-project.org/package=metaConvert)
+[![Total
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/metaConvert)](https://cran.r-project.org/package=metaConvert)
 
 ## Important
 
@@ -46,8 +50,8 @@ our work ;-) <br><br> <b>Citation:</b> <em>Gosling CJ, Cortese S, Solmi
 M, Haza B, Vieta E, Delorme R, Fusar-Poli P, & Radua J. (2024).
 metaConvert: An Automatic Suite for Estimation of 11 Different Effect
 Size Measures and Flexible Conversion Across Them. R package version
-1.0.0. <https://metaConvert.org/></em><br> To obtain a bibtex version of
-this citation in R, type
+1.0.0. <https://metaConvert.org/></em><br><br> To obtain a bibtex
+version of this citation in R, type
 
 ``` r
 citation(package = "metaConvert")

@@ -163,8 +163,8 @@
 NULL
 
 #' @importFrom stats sd aggregate.data.frame df dnorm na.omit optimize pnorm pt qnorm qt
+#' @importFrom utils packageVersion available.packages
 NULL
-
 utils::globalVariables(c(
   "y", "discard", "reshape",
   "row_id", "study_id", "author", "year", "predictor",

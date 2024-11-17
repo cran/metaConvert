@@ -177,7 +177,7 @@ es_from_pearson_r <- function(pearson_r, sd_iv, n_sample,
   es$r_ci_up <- r + qt(.975, n_sample - 2) * r_se
 
   es$z <- atanh(r)
-  es$z_se <- 1 / (n_sample - 3)
+  es$z_se <- sqrt(1 / (n_sample - 3))
   es$z_ci_lo <- es$z - qnorm(.975) * es$z_se
   es$z_ci_up <- es$z + qnorm(.975) * es$z_se
 

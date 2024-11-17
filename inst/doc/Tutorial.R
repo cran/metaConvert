@@ -12,7 +12,7 @@ library(DT)
 #  see_input_data(measure = "or")
 
 ## ----echo=FALSE---------------------------------------------------------------
-DT::datatable(see_input_data(measure = "or", extension="data.frame"), options = list(  
+DT::datatable(see_input_data(measure = "or", type_of_measure = "natural", extension="data.frame"), options = list(  
     scrollX = TRUE,
     dom = c('t'),
     scrollY = "300px", 
@@ -44,6 +44,13 @@ DT::datatable(data_extraction_sheet(measure = "or", extension="data.frame"), opt
 compare_df(
     df_extractor_1 = df.compare1,
     df_extractor_2 = df.compare2,
+    output = "html")
+
+## ----message=FALSE, fig.width= 11---------------------------------------------
+compare_df(
+    df_extractor_1 = df.compare1,
+    df_extractor_2 = df.compare2,
+    ordering_columns = c("author", "year"),
     output = "html")
 
 ## ----message=FALSE------------------------------------------------------------

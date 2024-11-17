@@ -2,7 +2,7 @@ Package: metaConvert
 Type: Package
 Title: An Automatic Suite for Estimation of Various Effect Size
         Measures
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(
         person(given = c("Corentin", "J."), family= "Gosling",  role = c("aut", "cre"),
                 email = "corentin.gosling@parisnanterre.fr"),
@@ -30,7 +30,7 @@ Authors@R: c(
 Maintainer: Corentin J. Gosling <corentin.gosling@parisnanterre.fr>
 Description: Automatically estimate 11 effect size measures from a well-formatted dataset. Various other functions can help, for example, removing dependency between several effect sizes, or identifying differences between two datasets.
     This package is mainly designed to assist in conducting a systematic review with a meta-analysis but can be useful to any researcher interested in estimating an effect size. 
-Imports: compareDF, metafor, estimraw, rio
+Imports: compareDF, metafor, mvtnorm, estimraw, rio
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -41,7 +41,7 @@ Suggests: testthat (>= 3.0.0), metaumbrella, TOSTER, esc, epiR,
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-10-26 09:01:23 UTC; Corentin Gosling
+Packaged: 2024-11-17 17:26:49 UTC; Corentin Gosling
 Author: Corentin J. Gosling [aut, cre],
   Samuele Cortese [aut],
   Marco Solmi [aut],
@@ -51,4 +51,4 @@ Author: Corentin J. Gosling [aut, cre],
   Paolo Fusar-Poli [aut],
   Joaquim Radua [aut]
 Repository: CRAN
-Date/Publication: 2024-10-26 09:20:02 UTC
+Date/Publication: 2024-11-17 17:40:02 UTC
